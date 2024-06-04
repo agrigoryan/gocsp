@@ -5,7 +5,7 @@ import (
 	"strings"
 )
 
-type Value uint32
+type Value int32
 
 type ValueSet []Value
 

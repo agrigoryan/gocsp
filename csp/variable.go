@@ -7,19 +7,13 @@ import (
 
 type Variable struct {
 	Id       any
-	Domain   *Domain
 	Value    Value
 	Assigned bool
 }
 
-func (v *Variable) Assign(value Value) error {
-	if !v.Domain.Contains(value) {
-		return fmt.Errorf("can not assign, value %v is not in the variable's domain", value)
-	}
-	v.Domain.RemoveAllBut(value)
+func (v *Variable) Assign(value Value) {
 	v.Value = value
 	v.Assigned = true
-	return nil
 }
 
 func (v *Variable) String() string {
@@ -28,15 +22,7 @@ func (v *Variable) String() string {
 	if v.Assigned {
 		builder.WriteString(fmt.Sprintf("%d", v.Value))
 	} else {
-		builder.WriteString("<nil>")
+		builder.WriteString("<none>")
 	}
-	builder.WriteString(fmt.Sprintf(", domain=%v", v.Domain))
 	return builder.String()
-}
-
-func NewVariable(id any, domain *Domain) *Variable {
-	return &Variable{
-		Id:     id,
-		Domain: domain,
-	}
 }
