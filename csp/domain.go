@@ -35,9 +35,3 @@ func (d *Domain) RemoveAllBut(value Value) {
 func (d *Domain) String() string {
 	return d.values.String()
 }
-
-func NewDomain(values ValueSet) *Domain {
-	return &Domain{
-		values,
-	}
-}

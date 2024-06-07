@@ -31,7 +31,7 @@ func (f ValuePickerFunc) VariableValue(assignment Assignment, varIndex int) Valu
 	return f(assignment, varIndex)
 }
 
-var FirstValuePicker ValuePickerFunc = func(assignment Assignment, varIndex int) Value {
+var FirstValidValuePicker ValuePickerFunc = func(assignment Assignment, varIndex int) Value {
 	return assignment.Domains[varIndex].Values()[0]
 }
 
@@ -58,23 +58,38 @@ func (s *SimpleSolver) solveAssignment(assignment Assignment, constraints []Cons
 		return variableValues(assignment.Variables)
 	}
 
-	// TODO: add logic
+	newAssignment := assignment.Copy()
+	varIdx := s.variablePicker.NextVariableIndex(assignment)
+	domain := newAssignment.Domains[varIdx]
+	for {
+		value := s.valuePicker.VariableValue(newAssignment, varIdx)
+		assignedVar := newAssignment.Variables[varIdx].Assign(value)
+		newAssignment.Variables[varIdx] = assignedVar
+		if !newAssignment.IsConsistent(assignedVar.Constraints) {
+			domain.Remove(value)
+			if domain.Size() == 0 {
+				return nil
+			}
+		} else {
+			break
+		}
+	}
 
-	return nil
+	return s.solveAssignment(newAssignment, constraints)
 }
 
 func createVariables(csp CSP) []Variable {
 	variables := make([]Variable, len(csp.Domains()))
 
 	for i := range csp.Domains() {
-		variables = append(variables, Variable{
+		variables[i] = Variable{
 			Index:    i,
 			Assigned: false,
-		})
+		}
 	}
 
 	for _, c := range csp.Constraints() {
-		for i := range c.AppliesTo() {
+		for _, i := range c.AppliesTo() {
 			variables[i].Constraints = append(variables[i].Constraints, c)
 		}
 	}
