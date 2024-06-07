@@ -1,17 +1,17 @@
 package csp
 
-// VariablePicker - a strategy to pick the next variable to assign
-type VariablePicker interface {
-	NextVariableIndex(assignment Assignment) int
+// VariableSelector - a strategy to pick the next variable to assign
+type VariableSelector interface {
+	SelectNextVariable(assignment Assignment) int
 }
 
-type VariablePickerFunc func(assignment Assignment) int
+type VariableSelectorFunc func(assignment Assignment) int
 
-func (f VariablePickerFunc) NextVariableIndex(assignment Assignment) int {
+func (f VariableSelectorFunc) SelectNextVariable(assignment Assignment) int {
 	return f(assignment)
 }
 
-var NextUnassignedVariablePicker VariablePickerFunc = func(assignment Assignment) int {
+var NextUnassignedVariableSelector VariableSelectorFunc = func(assignment Assignment) int {
 	for i, v := range assignment.Variables {
 		if !v.Assigned {
 			return i
@@ -20,18 +20,18 @@ var NextUnassignedVariablePicker VariablePickerFunc = func(assignment Assignment
 	panic("all variables are assigned")
 }
 
-// ValuePicker - a strategy to pick value to assign to a variable
-type ValuePicker interface {
-	VariableValue(assigment Assignment, varIndex int) Value
+// ValueSelector - a strategy to pick value to assign to a variable
+type ValueSelector interface {
+	SelectVariableValue(assigment Assignment, varIndex int) Value
 }
 
-type ValuePickerFunc func(assignment Assignment, varIndex int) Value
+type ValueSelectorFunc func(assignment Assignment, varIndex int) Value
 
-func (f ValuePickerFunc) VariableValue(assignment Assignment, varIndex int) Value {
+func (f ValueSelectorFunc) SelectVariableValue(assignment Assignment, varIndex int) Value {
 	return f(assignment, varIndex)
 }
 
-var FirstValidValuePicker ValuePickerFunc = func(assignment Assignment, varIndex int) Value {
+var FirstDomainValueSelector ValueSelectorFunc = func(assignment Assignment, varIndex int) Value {
 	return assignment.Domains[varIndex].Values()[0]
 }
 
@@ -41,8 +41,8 @@ type Solver interface {
 }
 
 type SimpleSolver struct {
-	variablePicker VariablePicker
-	valuePicker    ValuePicker
+	variableSelector VariableSelector
+	valueSelector    ValueSelector
 }
 
 func (s *SimpleSolver) Solve(csp CSP) []Value {
@@ -59,10 +59,10 @@ func (s *SimpleSolver) solveAssignment(assignment Assignment, constraints []Cons
 	}
 
 	newAssignment := assignment.Copy()
-	varIdx := s.variablePicker.NextVariableIndex(assignment)
+	varIdx := s.variableSelector.SelectNextVariable(assignment)
 	domain := newAssignment.Domains[varIdx]
 	for {
-		value := s.valuePicker.VariableValue(newAssignment, varIdx)
+		value := s.valueSelector.SelectVariableValue(newAssignment, varIdx)
 		assignedVar := newAssignment.Variables[varIdx].Assign(value)
 		newAssignment.Variables[varIdx] = assignedVar
 		if !newAssignment.IsConsistent(assignedVar.Constraints) {
@@ -105,9 +105,9 @@ func variableValues(variables []Variable) []Value {
 	return result
 }
 
-func NewSimpleSolver(variablePicker VariablePicker, valuePicker ValuePicker) *SimpleSolver {
+func NewSimpleSolver(variableSelector VariableSelector, valueSelector ValueSelector) *SimpleSolver {
 	return &SimpleSolver{
-		variablePicker: variablePicker,
-		valuePicker:    valuePicker,
+		variableSelector: variableSelector,
+		valueSelector:    valueSelector,
 	}
 }

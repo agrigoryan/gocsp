@@ -25,7 +25,7 @@ func TestSolveAustraliaMapColoring(t *testing.T) {
 	}
 
 	csp := NewGenericCSP(domains, constraints)
-	solver := NewSimpleSolver(NextUnassignedVariablePicker, FirstValidValuePicker)
+	solver := NewSimpleSolver(NextUnassignedVariableSelector, FirstDomainValueSelector)
 
 	result := solver.Solve(csp)
 
@@ -53,7 +53,7 @@ func BenchmarkSolveAustraliaMapColoring(b *testing.B) {
 	}
 	for i := 0; i < b.N; i++ {
 		csp := NewGenericCSP(domains, constraints)
-		solver := NewSimpleSolver(NextUnassignedVariablePicker, FirstValidValuePicker)
+		solver := NewSimpleSolver(NextUnassignedVariableSelector, FirstDomainValueSelector)
 		assert.NotNil(b, solver.Solve(csp))
 	}
 }
