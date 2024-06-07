@@ -1,54 +1,98 @@
 package csp
 
-import (
-	"fmt"
-)
-
-type SolverResult []Value
-
-type Solver interface {
-	Solve(csp CSP) []SolverResult
+// VariablePicker - a strategy to pick the next variable to assign
+type VariablePicker interface {
+	NextVariableIndex(assignment Assignment) int
 }
 
-type SolverFunc func(csp CSP) []SolverResult
+type VariablePickerFunc func(assignment Assignment) int
 
-func (f SolverFunc) Solve(csp CSP) []SolverResult {
-	return f(csp)
+func (f VariablePickerFunc) NextVariableIndex(assignment Assignment) int {
+	return f(assignment)
 }
 
-type SimpleSolver struct{}
-
-func (s *SimpleSolver) Solve(csp CSP) []SolverResult {
-	domains := csp.Domains()
-	variables := make([]Variable, len(domains))
-	for i := range domains {
-		variables = append(variables, Variable{
-			Id:       i,
-			Assigned: false,
-		})
+var NextUnassignedVariablePicker VariablePickerFunc = func(assignment Assignment) int {
+	for i, v := range assignment.Variables {
+		if !v.Assigned {
+			return i
+		}
 	}
-	// TODO: solve the problem
+	panic("all variables are assigned")
+}
+
+// ValuePicker - a strategy to pick value to assign to a variable
+type ValuePicker interface {
+	VariableValue(assigment Assignment, varIndex int) Value
+}
+
+type ValuePickerFunc func(assignment Assignment, varIndex int) Value
+
+func (f ValuePickerFunc) VariableValue(assignment Assignment, varIndex int) Value {
+	return f(assignment, varIndex)
+}
+
+var FirstValuePicker ValuePickerFunc = func(assignment Assignment, varIndex int) Value {
+	return assignment.Domains[varIndex].Values()[0]
+}
+
+// Solver - generic interface to solve CSP
+type Solver interface {
+	Solve(csp CSP) []Value
+}
+
+type SimpleSolver struct {
+	variablePicker VariablePicker
+	valuePicker    ValuePicker
+}
+
+func (s *SimpleSolver) Solve(csp CSP) []Value {
+	assignment := Assignment{
+		Variables: createVariables(csp),
+		Domains:   csp.Domains(),
+	}
+	return s.solveAssignment(assignment, csp.Constraints())
+}
+
+func (s *SimpleSolver) solveAssignment(assignment Assignment, constraints []Constraint) []Value {
+	if assignment.IsComplete(constraints) {
+		return variableValues(assignment.Variables)
+	}
+
+	// TODO: add logic
+
 	return nil
 }
 
-func pickNextVariableToAssign(variables []Variable) (int, error) {
-	for i, v := range variables {
-		if !v.Assigned {
-			return i, nil
+func createVariables(csp CSP) []Variable {
+	variables := make([]Variable, len(csp.Domains()))
+
+	for i := range csp.Domains() {
+		variables = append(variables, Variable{
+			Index:    i,
+			Assigned: false,
+		})
+	}
+
+	for _, c := range csp.Constraints() {
+		for i := range c.AppliesTo() {
+			variables[i].Constraints = append(variables[i].Constraints, c)
 		}
 	}
-	return 0, fmt.Errorf("all variables are assigned")
+
+	return variables
 }
 
-func allAssigned(variables []Variable) bool {
-	for _, v := range variables {
-		if !v.Assigned {
-			return false
-		}
+func variableValues(variables []Variable) []Value {
+	result := make([]Value, len(variables))
+	for i := range variables {
+		result[i] = variables[i].Value
 	}
-	return true
+	return result
 }
 
-func NewSimpleSolver() *SimpleSolver {
-	return &SimpleSolver{}
+func NewSimpleSolver(variablePicker VariablePicker, valuePicker ValuePicker) *SimpleSolver {
+	return &SimpleSolver{
+		variablePicker: variablePicker,
+		valuePicker:    valuePicker,
+	}
 }

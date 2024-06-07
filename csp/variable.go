@@ -6,19 +6,25 @@ import (
 )
 
 type Variable struct {
-	Id       any
+	Index    int
 	Value    Value
 	Assigned bool
+
+	Constraints []Constraint
 }
 
-func (v *Variable) Assign(value Value) {
-	v.Value = value
-	v.Assigned = true
+func (v Variable) Assign(value Value) Variable {
+	return Variable{
+		Index:       v.Index,
+		Value:       value,
+		Assigned:    true,
+		Constraints: v.Constraints,
+	}
 }
 
-func (v *Variable) String() string {
+func (v Variable) String() string {
 	builder := &strings.Builder{}
-	builder.WriteString(fmt.Sprintf("variable %v: value=", v.Id))
+	builder.WriteString(fmt.Sprintf("variable %d: value=", v.Index))
 	if v.Assigned {
 		builder.WriteString(fmt.Sprintf("%d", v.Value))
 	} else {
