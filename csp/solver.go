@@ -61,21 +61,23 @@ func (s *SimpleSolver) solveAssignment(assignment Assignment, constraints []Cons
 	newAssignment := assignment.Copy()
 	varIdx := s.variableSelector.SelectNextVariable(assignment)
 	domain := newAssignment.Domains[varIdx]
-	for {
+	for domain.Size() > 0 {
 		value := s.valueSelector.SelectVariableValue(newAssignment, varIdx)
 		assignedVar := newAssignment.Variables[varIdx].Assign(value)
 		newAssignment.Variables[varIdx] = assignedVar
 		if !newAssignment.IsConsistent(assignedVar.Constraints) {
 			domain.Remove(value)
-			if domain.Size() == 0 {
-				return nil
-			}
 		} else {
-			break
+			res := s.solveAssignment(newAssignment, constraints)
+			if res != nil {
+				return res
+			} else {
+				domain.Remove(value)
+			}
 		}
 	}
 
-	return s.solveAssignment(newAssignment, constraints)
+	return nil
 }
 
 func createVariables(csp CSP) []Variable {

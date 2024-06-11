@@ -26,7 +26,7 @@ func (c GenericConstraint) IsBooleanConstraint() bool {
 	return len(c.indices) == 2
 }
 
-func AllDifferentConstraintFunc(indices []int, assignment Assignment) bool {
+func AllDiffConstraintFunc(indices []int, assignment Assignment) bool {
 	for i := 0; i < len(indices); i++ {
 		var1 := assignment.Variables[indices[i]]
 		if !var1.Assigned {
@@ -42,6 +42,12 @@ func AllDifferentConstraintFunc(indices []int, assignment Assignment) bool {
 	return true
 }
 
+func BinaryAllDiffConstraintFunc(indices []int, assignment Assignment) bool {
+	return !assignment.Variables[indices[0]].Assigned ||
+		!assignment.Variables[indices[1]].Assigned ||
+		assignment.Variables[indices[0]].Value != assignment.Variables[indices[1]].Value
+}
+
 func NewConstraint(indices []int, checkingFunc ConstraintFunc) GenericConstraint {
 	return GenericConstraint{
 		indices:      indices,
@@ -50,12 +56,13 @@ func NewConstraint(indices []int, checkingFunc ConstraintFunc) GenericConstraint
 }
 
 func NewBinaryConstraint(idx1, idx2 int, checkingFunc ConstraintFunc) GenericConstraint {
-	return GenericConstraint{
-		indices:      []int{idx1, idx2},
-		checkingFunc: checkingFunc,
-	}
+	return NewConstraint([]int{idx1, idx2}, checkingFunc)
 }
 
-func NewAllDifferentConstraint(indices []int) GenericConstraint {
-	return NewConstraint(indices, AllDifferentConstraintFunc)
+func NewAllDiffConstraint(indices []int) GenericConstraint {
+	return NewConstraint(indices, AllDiffConstraintFunc)
+}
+
+func NewBinaryAllDiffConstraint(idx1, idx2 int) GenericConstraint {
+	return NewBinaryConstraint(idx1, idx2, BinaryAllDiffConstraintFunc)
 }
