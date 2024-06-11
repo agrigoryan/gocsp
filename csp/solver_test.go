@@ -13,15 +13,15 @@ func TestSolveAustraliaMapColoring(t *testing.T) {
 		domains[i] = Domain{[]Value{1, 2, 3}}
 	}
 	constraints := []Constraint{
-		AllDifferent{[]int{0, 1}},
-		AllDifferent{[]int{0, 2}},
-		AllDifferent{[]int{1, 2}},
-		AllDifferent{[]int{1, 3}},
-		AllDifferent{[]int{2, 3}},
-		AllDifferent{[]int{2, 4}},
-		AllDifferent{[]int{2, 5}},
-		AllDifferent{[]int{3, 4}},
-		AllDifferent{[]int{4, 5}},
+		NewAllDifferentConstraint([]int{0, 1}),
+		NewAllDifferentConstraint([]int{0, 2}),
+		NewAllDifferentConstraint([]int{1, 2}),
+		NewAllDifferentConstraint([]int{1, 3}),
+		NewAllDifferentConstraint([]int{2, 3}),
+		NewAllDifferentConstraint([]int{2, 4}),
+		NewAllDifferentConstraint([]int{2, 5}),
+		NewAllDifferentConstraint([]int{3, 4}),
+		NewAllDifferentConstraint([]int{4, 5}),
 	}
 
 	csp := NewGenericCSP(domains, constraints)
@@ -41,15 +41,15 @@ func BenchmarkSolveAustraliaMapColoring(b *testing.B) {
 		domains[i] = Domain{[]Value{1, 2, 3}}
 	}
 	constraints := []Constraint{
-		AllDifferent{[]int{0, 1}},
-		AllDifferent{[]int{0, 2}},
-		AllDifferent{[]int{1, 2}},
-		AllDifferent{[]int{1, 3}},
-		AllDifferent{[]int{2, 3}},
-		AllDifferent{[]int{2, 4}},
-		AllDifferent{[]int{2, 5}},
-		AllDifferent{[]int{3, 4}},
-		AllDifferent{[]int{4, 5}},
+		NewAllDifferentConstraint([]int{0, 1}),
+		NewAllDifferentConstraint([]int{0, 2}),
+		NewAllDifferentConstraint([]int{1, 2}),
+		NewAllDifferentConstraint([]int{1, 3}),
+		NewAllDifferentConstraint([]int{2, 3}),
+		NewAllDifferentConstraint([]int{2, 4}),
+		NewAllDifferentConstraint([]int{2, 5}),
+		NewAllDifferentConstraint([]int{3, 4}),
+		NewAllDifferentConstraint([]int{4, 5}),
 	}
 	for i := 0; i < b.N; i++ {
 		csp := NewGenericCSP(domains, constraints)
