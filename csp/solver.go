@@ -59,7 +59,7 @@ func (s *SimpleSolver) solveAssignment(assignment Assignment, constraints []Cons
 	}
 
 	newAssignment := assignment.Copy()
-	varIdx := s.variableSelector.SelectNextVariable(assignment)
+	varIdx := s.variableSelector.SelectNextVariable(newAssignment)
 	domain := newAssignment.Domains[varIdx]
 	for domain.Size() > 0 {
 		value := s.valueSelector.SelectVariableValue(newAssignment, varIdx)
@@ -67,13 +67,15 @@ func (s *SimpleSolver) solveAssignment(assignment Assignment, constraints []Cons
 		newAssignment.Variables[varIdx] = assignedVar
 		if !newAssignment.IsConsistent(assignedVar.Constraints) {
 			domain.Remove(value)
+			continue
+		}
+		// TODO: run forward checking or other consistency checks here on the new assignment
+		// TODO: make assignment implement an interface that defines a function to get a value at index if set, use that in the constraint instead of an assignment. Make a proxy to change one value in an assignment without copying the whole thing
+		res := s.solveAssignment(newAssignment, constraints)
+		if res != nil {
+			return res
 		} else {
-			res := s.solveAssignment(newAssignment, constraints)
-			if res != nil {
-				return res
-			} else {
-				domain.Remove(value)
-			}
+			domain.Remove(value)
 		}
 	}
 

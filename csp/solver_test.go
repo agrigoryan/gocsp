@@ -66,11 +66,16 @@ func setupNQueensCSP(n int) *GenericCSP {
 		domains[i] = Domain{slices.Clone(values)}
 		for j := 0; j < n; j++ {
 			if j != i {
-				constraints = append(constraints, NewConstraint([]int{i, j}, func(indices []int, assignment Assignment) bool {
-					return !assignment.Variables[indices[0]].Assigned ||
-						!assignment.Variables[indices[1]].Assigned ||
-						(assignment.Variables[indices[0]].Value != assignment.Variables[indices[1]].Value &&
-							abs(int(assignment.Variables[indices[0]].Value)-int(assignment.Variables[indices[1]].Value)) != abs(i-j))
+				constraints = append(constraints, NewConstraint([]int{i, j}, func(indices []int, assignment AssignedValues) bool {
+					v1, ok := assignment.AssignedValue(indices[0])
+					if !ok {
+						return true
+					}
+					v2, ok := assignment.AssignedValue(indices[1])
+					if !ok {
+						return true
+					}
+					return v1 != v2 && abs(int(v1)-int(v2)) != abs(i-j)
 				}))
 			}
 		}

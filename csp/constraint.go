@@ -1,20 +1,26 @@
 package csp
 
+type AssignedValues interface {
+	// AssignedValue - return the value of the assigned variable at the given index.
+	// If the variable at the given index is not assigned, return
+	AssignedValue(idx int) (Value, bool)
+}
+
 type Constraint interface {
-	IsSatisfied(assignment Assignment) bool
+	IsSatisfied(assignment AssignedValues) bool
 
 	// AppliesTo - The list of indices this constraint applies to
 	AppliesTo() []int
 }
 
-type ConstraintFunc func(indices []int, assignment Assignment) bool
+type ConstraintFunc func(indices []int, assignment AssignedValues) bool
 
 type GenericConstraint struct {
 	indices      []int
 	checkingFunc ConstraintFunc
 }
 
-func (c GenericConstraint) IsSatisfied(assignment Assignment) bool {
+func (c GenericConstraint) IsSatisfied(assignment AssignedValues) bool {
 	return c.checkingFunc(c.indices, assignment)
 }
 
@@ -26,26 +32,20 @@ func (c GenericConstraint) IsBooleanConstraint() bool {
 	return len(c.indices) == 2
 }
 
-func AllDiffConstraintFunc(indices []int, assignment Assignment) bool {
+func AllDiffConstraintFunc(indices []int, assignment AssignedValues) bool {
 	for i := 0; i < len(indices); i++ {
-		var1 := assignment.Variables[indices[i]]
-		if !var1.Assigned {
+		val1, ok := assignment.AssignedValue(indices[i])
+		if !ok {
 			continue
 		}
 		for j := i + 1; j < len(indices); j++ {
-			var2 := assignment.Variables[indices[j]]
-			if var2.Assigned && var1.Value == var2.Value {
+			val2, ok := assignment.AssignedValue(indices[j])
+			if ok && val1 == val2 {
 				return false
 			}
 		}
 	}
 	return true
-}
-
-func BinaryAllDiffConstraintFunc(indices []int, assignment Assignment) bool {
-	return !assignment.Variables[indices[0]].Assigned ||
-		!assignment.Variables[indices[1]].Assigned ||
-		assignment.Variables[indices[0]].Value != assignment.Variables[indices[1]].Value
 }
 
 func NewConstraint(indices []int, checkingFunc ConstraintFunc) GenericConstraint {
@@ -61,8 +61,4 @@ func NewBinaryConstraint(idx1, idx2 int, checkingFunc ConstraintFunc) GenericCon
 
 func NewAllDiffConstraint(indices []int) GenericConstraint {
 	return NewConstraint(indices, AllDiffConstraintFunc)
-}
-
-func NewBinaryAllDiffConstraint(idx1, idx2 int) GenericConstraint {
-	return NewBinaryConstraint(idx1, idx2, BinaryAllDiffConstraintFunc)
 }

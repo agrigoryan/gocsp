@@ -31,3 +31,7 @@ func (a Assignment) Copy() Assignment {
 		Domains:   slices.Clone(a.Domains),
 	}
 }
+
+func (a Assignment) AssignedValue(idx int) (Value, bool) {
+	return a.Variables[idx].Value, a.Variables[idx].Assigned
+}
