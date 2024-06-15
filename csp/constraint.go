@@ -1,28 +1,21 @@
 package csp
 
-type Constraint interface {
-	IsSatisfied(assignment Assignment) bool
-
-	// AppliesTo - The list of indices this constraint applies to
-	AppliesTo() []int
-}
-
 type ConstraintFunc func(indices []int, assignment Assignment) bool
 
-type GenericConstraint struct {
+type Constraint struct {
 	indices      []int
 	checkingFunc ConstraintFunc
 }
 
-func (c GenericConstraint) IsSatisfied(assignment Assignment) bool {
+func (c Constraint) IsSatisfied(assignment Assignment) bool {
 	return c.checkingFunc(c.indices, assignment)
 }
 
-func (c GenericConstraint) AppliesTo() []int {
+func (c Constraint) AppliesTo() []int {
 	return c.indices
 }
 
-func (c GenericConstraint) IsBooleanConstraint() bool {
+func (c Constraint) IsBooleanConstraint() bool {
 	return len(c.indices) == 2
 }
 
@@ -48,21 +41,21 @@ func BinaryAllDiffConstraintFunc(indices []int, assignment Assignment) bool {
 		assignment.Variables[indices[0]].Value != assignment.Variables[indices[1]].Value
 }
 
-func NewConstraint(indices []int, checkingFunc ConstraintFunc) GenericConstraint {
-	return GenericConstraint{
+func NewConstraint(indices []int, checkingFunc ConstraintFunc) Constraint {
+	return Constraint{
 		indices:      indices,
 		checkingFunc: checkingFunc,
 	}
 }
 
-func NewBinaryConstraint(idx1, idx2 int, checkingFunc ConstraintFunc) GenericConstraint {
+func NewBinaryConstraint(idx1, idx2 int, checkingFunc ConstraintFunc) Constraint {
 	return NewConstraint([]int{idx1, idx2}, checkingFunc)
 }
 
-func NewAllDiffConstraint(indices []int) GenericConstraint {
+func NewAllDiffConstraint(indices []int) Constraint {
 	return NewConstraint(indices, AllDiffConstraintFunc)
 }
 
-func NewBinaryAllDiffConstraint(idx1, idx2 int) GenericConstraint {
+func NewBinaryAllDiffConstraint(idx1, idx2 int) Constraint {
 	return NewBinaryConstraint(idx1, idx2, BinaryAllDiffConstraintFunc)
 }
