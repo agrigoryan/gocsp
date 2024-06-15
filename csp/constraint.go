@@ -6,29 +6,22 @@ type AssignedValues interface {
 	AssignedValue(idx int) (Value, bool)
 }
 
-type Constraint interface {
-	IsSatisfied(assignment AssignedValues) bool
-
-	// AppliesTo - The list of indices this constraint applies to
-	AppliesTo() []int
-}
-
 type ConstraintFunc func(indices []int, assignment AssignedValues) bool
 
-type GenericConstraint struct {
+type Constraint struct {
 	indices      []int
 	checkingFunc ConstraintFunc
 }
 
-func (c GenericConstraint) IsSatisfied(assignment AssignedValues) bool {
+func (c Constraint) IsSatisfied(assignment AssignedValues) bool {
 	return c.checkingFunc(c.indices, assignment)
 }
 
-func (c GenericConstraint) AppliesTo() []int {
+func (c Constraint) AppliesTo() []int {
 	return c.indices
 }
 
-func (c GenericConstraint) IsBooleanConstraint() bool {
+func (c Constraint) IsBooleanConstraint() bool {
 	return len(c.indices) == 2
 }
 
@@ -48,17 +41,17 @@ func AllDiffConstraintFunc(indices []int, assignment AssignedValues) bool {
 	return true
 }
 
-func NewConstraint(indices []int, checkingFunc ConstraintFunc) GenericConstraint {
-	return GenericConstraint{
+func NewConstraint(indices []int, checkingFunc ConstraintFunc) Constraint {
+	return Constraint{
 		indices:      indices,
 		checkingFunc: checkingFunc,
 	}
 }
 
-func NewBinaryConstraint(idx1, idx2 int, checkingFunc ConstraintFunc) GenericConstraint {
+func NewBinaryConstraint(idx1, idx2 int, checkingFunc ConstraintFunc) Constraint {
 	return NewConstraint([]int{idx1, idx2}, checkingFunc)
 }
 
-func NewAllDiffConstraint(indices []int) GenericConstraint {
+func NewAllDiffConstraint(indices []int) Constraint {
 	return NewConstraint(indices, AllDiffConstraintFunc)
 }
