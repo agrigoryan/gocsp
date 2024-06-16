@@ -66,7 +66,7 @@ func setupNQueensCSP(n int) *GenericCSP {
 		domains[i] = Domain{slices.Clone(values)}
 		for j := 0; j < n; j++ {
 			if j != i {
-				constraints = append(constraints, NewConstraint([]int{i, j}, func(indices []int, assignment AssignedValues) bool {
+				constraints = append(constraints, NewConstraint([]int{i, j}, func(indices []int, assignment Assignment) bool {
 					v1, ok := assignment.AssignedValue(indices[0])
 					if !ok {
 						return true

@@ -1,19 +1,13 @@
 package csp
 
-type AssignedValues interface {
-	// AssignedValue - return the value of the assigned variable at the given index.
-	// If the variable at the given index is not assigned, return
-	AssignedValue(idx int) (Value, bool)
-}
-
-type ConstraintFunc func(indices []int, assignment AssignedValues) bool
+type ConstraintFunc func(indices []int, assignment Assignment) bool
 
 type Constraint struct {
 	indices      []int
 	checkingFunc ConstraintFunc
 }
 
-func (c Constraint) IsSatisfied(assignment AssignedValues) bool {
+func (c Constraint) IsSatisfied(assignment Assignment) bool {
 	return c.checkingFunc(c.indices, assignment)
 }
 
@@ -25,7 +19,7 @@ func (c Constraint) IsBooleanConstraint() bool {
 	return len(c.indices) == 2
 }
 
-func AllDiffConstraintFunc(indices []int, assignment AssignedValues) bool {
+func AllDiffConstraintFunc(indices []int, assignment Assignment) bool {
 	for i := 0; i < len(indices); i++ {
 		val1, ok := assignment.AssignedValue(indices[i])
 		if !ok {
