@@ -35,3 +35,7 @@ func (d *Domain) RemoveAllBut(value Value) {
 func (d *Domain) String() string {
 	return d.values.String()
 }
+
+func (d *Domain) ShallowCopy() Domain {
+	return Domain{values: d.values[:]}
+}

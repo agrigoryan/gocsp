@@ -22,6 +22,14 @@ func (v Variable) Assign(value Value) Variable {
 	}
 }
 
+func (v Variable) Unassign() Variable {
+	return Variable{
+		Index:       v.Index,
+		Assigned:    false,
+		Constraints: v.Constraints,
+	}
+}
+
 func (v Variable) String() string {
 	builder := &strings.Builder{}
 	builder.WriteString(fmt.Sprintf("variable %d: value=", v.Index))
