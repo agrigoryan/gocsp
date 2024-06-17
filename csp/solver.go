@@ -43,6 +43,7 @@ type Solver interface {
 type SimpleSolver struct {
 	variableSelector VariableSelector
 	valueSelector    ValueSelector
+	inference        Inference
 }
 
 func (s *SimpleSolver) Solve(csp CSP) []Value {
@@ -70,13 +71,17 @@ func (s *SimpleSolver) solveAssignment(assignment Assignment, constraints []Cons
 			domain.Remove(value)
 			continue
 		}
-		// TODO: run forward checking or other consistency checks here on the new assignment
-		res := s.solveAssignment(assignment, constraints)
-		if res != nil {
-			return res
-		} else {
-			domain.Remove(value)
+
+		updatedAssignment, ok := s.inference.Inference(assignment, constraints, varIdx)
+		if ok {
+			assignment = updatedAssignment
+			res := s.solveAssignment(assignment, constraints)
+			if res != nil {
+				return res
+			}
 		}
+
+		domain.Remove(value)
 	}
 
 	assignment.Variables[varIdx] = assignment.Variables[varIdx].Unassign()
@@ -112,9 +117,10 @@ func variableValues(variables []Variable) []Value {
 	return result
 }
 
-func NewSimpleSolver(variableSelector VariableSelector, valueSelector ValueSelector) *SimpleSolver {
+func NewSimpleSolver(variableSelector VariableSelector, valueSelector ValueSelector, inference Inference) *SimpleSolver {
 	return &SimpleSolver{
 		variableSelector: variableSelector,
 		valueSelector:    valueSelector,
+		inference:        inference,
 	}
 }
