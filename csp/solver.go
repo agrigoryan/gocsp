@@ -1,5 +1,7 @@
 package csp
 
+import "math"
+
 // VariableSelector - a strategy to pick the next variable to assign
 type VariableSelector interface {
 	SelectNextVariable(assignment Assignment) int
@@ -18,6 +20,22 @@ var NextUnassignedVariableSelector VariableSelectorFunc = func(assignment Assign
 		}
 	}
 	panic("all variables are assigned")
+}
+
+// MRVVariableSelector - Minimum Remaining Values heuristic implementation
+var MRVVariableSelector VariableSelectorFunc = func(assignment Assignment) int {
+	minDomainSize := math.MaxInt32
+	varIdx := -1
+	for i, v := range assignment.Variables {
+		if !v.Assigned && assignment.Domains[i].Size() < minDomainSize {
+			minDomainSize = assignment.Domains[i].Size()
+			varIdx = i
+		}
+	}
+	if varIdx == -1 {
+		panic("all variables are assigned")
+	}
+	return varIdx
 }
 
 // ValueSelector - a strategy to pick value to assign to a variable
@@ -72,7 +90,7 @@ func (s *SimpleSolver) solveAssignment(assignment Assignment, constraints []Cons
 			continue
 		}
 
-		updatedAssignment, ok := s.inference.Inference(assignment, constraints, varIdx)
+		updatedAssignment, ok := s.inference.Inference(assignment, varIdx)
 		if ok {
 			assignment = updatedAssignment
 			res := s.solveAssignment(assignment, constraints)

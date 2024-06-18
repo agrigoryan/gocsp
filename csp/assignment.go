@@ -8,8 +8,8 @@ type Assignment struct {
 }
 
 func (a Assignment) IsConsistent(constraints []Constraint) bool {
-	for _, c := range constraints {
-		if !c.IsSatisfied(a) {
+	for i := 0; i < len(constraints); i++ {
+		if !constraints[i].IsSatisfied(a) {
 			return false
 		}
 	}
@@ -17,8 +17,8 @@ func (a Assignment) IsConsistent(constraints []Constraint) bool {
 }
 
 func (a Assignment) IsComplete(constraints []Constraint) bool {
-	for _, v := range a.Variables {
-		if !v.Assigned {
+	for i := 0; i < len(a.Variables); i++ {
+		if !a.Variables[i].Assigned {
 			return false
 		}
 	}

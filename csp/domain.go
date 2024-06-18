@@ -25,9 +25,10 @@ func (d *Domain) Remove(value Value) {
 }
 
 func (d *Domain) RemoveAllBut(value Value) {
-	for _, v := range d.values.Copy() {
-		if v != value {
-			d.Remove(v)
+	for i := 0; i < d.values.Size(); i++ {
+		if d.values[i] != value {
+			d.Remove(d.values[i])
+			i--
 		}
 	}
 }

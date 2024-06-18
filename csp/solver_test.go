@@ -30,7 +30,7 @@ func setupAustraliaMapColoringCSP() *GenericCSP {
 
 func TestAustraliaMapColoringSolver(t *testing.T) {
 	csp := setupAustraliaMapColoringCSP()
-	solver := NewSimpleSolver(NextUnassignedVariableSelector, FirstDomainValueSelector, NoInferenceFunc)
+	solver := NewSimpleSolver(NextUnassignedVariableSelector, FirstDomainValueSelector, ForwardCheckInferenceFunc)
 
 	result := solver.Solve(csp)
 
@@ -85,9 +85,9 @@ func setupNQueensCSP(n int) *GenericCSP {
 }
 
 func TestNQueensSolver(t *testing.T) {
-	csp := setupNQueensCSP(20)
+	csp := setupNQueensCSP(25)
 
-	solver := NewSimpleSolver(NextUnassignedVariableSelector, FirstDomainValueSelector, NoInferenceFunc)
+	solver := NewSimpleSolver(NextUnassignedVariableSelector, FirstDomainValueSelector, ForwardCheckInferenceFunc)
 
 	result := solver.Solve(csp)
 
@@ -97,10 +97,10 @@ func TestNQueensSolver(t *testing.T) {
 }
 
 func BenchmarkNQueensSolver(b *testing.B) {
-	csp := setupNQueensCSP(20)
+	csp := setupNQueensCSP(25)
 	for i := 0; i < b.N; i++ {
 		csp = NewGenericCSP(csp.domains, csp.constraints)
-		solver := NewSimpleSolver(NextUnassignedVariableSelector, FirstDomainValueSelector, NoInferenceFunc)
+		solver := NewSimpleSolver(NextUnassignedVariableSelector, FirstDomainValueSelector, ForwardCheckInferenceFunc)
 		assert.NotNil(b, solver.Solve(csp))
 	}
 }
