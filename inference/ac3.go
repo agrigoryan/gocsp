@@ -15,7 +15,7 @@ var AC3 csp.InferenceFunc = func(assignment csp.Assignment, constraints []csp.Co
 	queue := make([]arc, 0, 2*len(constraints))
 	for _, c := range constraints {
 		cIndices := c.AppliesTo()
-		if c.IsBooleanConstraint() && !as.Variables[cIndices[0]].Assigned {
+		if c.IsBinaryConstraint() && !as.Variables[cIndices[0]].Assigned {
 			queue = append(queue, arc{s: cIndices[0], t: cIndices[1], c: c}, arc{s: cIndices[1], t: cIndices[0], c: c})
 		}
 	}
@@ -78,7 +78,7 @@ var AC3 csp.InferenceFunc = func(assignment csp.Assignment, constraints []csp.Co
 				if neighborIdx == varIdx {
 					neighborIdx = cIndices[1]
 				}
-				if c.IsBooleanConstraint() && neighborIdx != a.t {
+				if c.IsBinaryConstraint() && neighborIdx != a.t {
 					queue = append(queue, arc{s: neighborIdx, t: varIdx, c: c})
 				}
 			}

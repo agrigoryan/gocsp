@@ -15,7 +15,7 @@ func (c Constraint) AppliesTo() []int {
 	return c.indices
 }
 
-func (c Constraint) IsBooleanConstraint() bool {
+func (c Constraint) IsBinaryConstraint() bool {
 	return len(c.indices) == 2
 }
 
