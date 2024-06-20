@@ -10,7 +10,7 @@ import (
 
 func TestAusMapWithFwdCheck(t *testing.T) {
 	problem := problems.AusMap()
-	solver := csp.NewSimpleSolver(csp.NextUnassignedVariableSelector, csp.FirstDomainValueSelector, AC3)
+	solver := csp.NewSimpleSolver(csp.NextUnassignedVariableSelector, csp.FirstDomainValueSelector, FwdCheck)
 
 	result := solver.Solve(problem)
 
@@ -23,10 +23,26 @@ func BenchmarkAusMapWithFwdCheck(b *testing.B) {
 	benchWithFwdCheck(problem, b)
 }
 
+func TestNQueensWithFwdCheck(t *testing.T) {
+	problem := problems.NQueens(25)
+	solver := csp.NewSimpleSolver(csp.NextUnassignedVariableSelector, csp.FirstDomainValueSelector, FwdCheck)
+
+	result := solver.Solve(problem)
+
+	fmt.Println(result)
+	assert.NotNil(t, result)
+
+}
+
+func BenchmarkNQueensWithFwdCheck(b *testing.B) {
+	problem := problems.NQueens(25)
+	benchWithFwdCheck(problem, b)
+}
+
 func benchWithFwdCheck(problem csp.CSP, b *testing.B) {
 	for i := 0; i < b.N; i++ {
 		problem = csp.NewGenericCSP(problem.Domains(), problem.Constraints())
-		solver := csp.NewSimpleSolver(csp.NextUnassignedVariableSelector, csp.FirstDomainValueSelector, AC3)
+		solver := csp.NewSimpleSolver(csp.NextUnassignedVariableSelector, csp.FirstDomainValueSelector, FwdCheck)
 		assert.NotNil(b, solver.Solve(problem))
 	}
 }

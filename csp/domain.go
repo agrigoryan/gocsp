@@ -27,13 +27,7 @@ func (d Domain) Remove(value Value) Domain {
 }
 
 func (d Domain) RemoveAllBut(value Value) Domain {
-	for i := 0; i < d.values.Size(); i++ {
-		if d.values[i] == value {
-			d.values[0], d.values[i] = d.values[i], d.values[0]
-			d.values = d.values[:1]
-			break
-		}
-	}
+	d.values = d.values.RemoveAllBut(value)
 	return d
 }
 

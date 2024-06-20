@@ -11,26 +11,34 @@ type Variable struct {
 	Assigned bool
 
 	Constraints []Constraint
+	Domain      Domain
 }
 
-func (v Variable) Assign(value Value) Variable {
-	return Variable{
-		Index:       v.Index,
-		Value:       value,
-		Assigned:    true,
-		Constraints: v.Constraints,
-	}
+func (v *Variable) Assign(value Value) {
+	v.Value = value
+	v.Assigned = true
 }
 
-func (v Variable) Unassign() Variable {
-	return Variable{
-		Index:       v.Index,
-		Assigned:    false,
-		Constraints: v.Constraints,
-	}
+func (v *Variable) AssignAndReduceDomain(value Value) {
+	v.Value = value
+	v.Assigned = true
+	v.RemoveRestFromDomain(value)
 }
 
-func (v Variable) String() string {
+func (v *Variable) Unassign() {
+	v.Value = 0
+	v.Assigned = false
+}
+
+func (v *Variable) RemoveFromDomain(value Value) {
+	v.Domain = v.Domain.Remove(value)
+}
+
+func (v *Variable) RemoveRestFromDomain(valueToKeep Value) {
+	v.Domain = v.Domain.RemoveAllBut(valueToKeep)
+}
+
+func (v *Variable) String() string {
 	builder := &strings.Builder{}
 	builder.WriteString(fmt.Sprintf("variable %d: value=", v.Index))
 	if v.Assigned {

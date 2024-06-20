@@ -22,24 +22,24 @@ var AC3 csp.InferenceFunc = func(assignment csp.Assignment, constraints []csp.Co
 
 	revise := func(a arc) bool {
 		idx1, idx2 := a.s, a.t
-		v1, v2 := as.Variables[idx1], as.Variables[idx2]
-		d1, d2 := as.Domains[idx1], as.Domains[idx2]
+		v1, v2 := as.Variable(idx1), as.Variable(idx2)
+		d1, d2 := v1.Domain, v2.Domain
 
 		revised := false
 
 		var di, dj csp.Value
 		for i := 0; i < d1.Size(); i++ {
 			di = d1.Values()[i]
-			as.Variables[idx1] = v1.Assign(di)
+			v1.Assign(di)
 			anyValueSatisfiesArc := false
 			if v2.Assigned {
 				anyValueSatisfiesArc = a.c.IsSatisfied(as)
 			} else {
 				for j := 0; j < d2.Size(); j++ {
 					dj = d2.Values()[j]
-					as.Variables[idx2] = v2.Assign(dj)
+					v2.Assign(dj)
 					arcSatisfied := a.c.IsSatisfied(as)
-					as.Variables[idx2] = v2
+					v2.Unassign()
 					if arcSatisfied {
 						anyValueSatisfiesArc = true
 						break
@@ -47,15 +47,12 @@ var AC3 csp.InferenceFunc = func(assignment csp.Assignment, constraints []csp.Co
 				}
 			}
 			if !anyValueSatisfiesArc {
-				d1 = d1.Remove(di)
-				as.Domains[idx1] = d1
-				i--
+				v1.RemoveFromDomain(di)
 				revised = true
 			}
 		}
 
-		as.Variables[idx1] = v1
-		as.Variables[idx2] = v2
+		v1.Unassign()
 
 		return revised
 	}
@@ -64,9 +61,10 @@ var AC3 csp.InferenceFunc = func(assignment csp.Assignment, constraints []csp.Co
 		a := queue[0]
 		queue = queue[1:]
 		varIdx := a.s
+		variable := as.Variable(varIdx)
 
 		if revise(a) {
-			if as.Domains[varIdx].Size() == 0 {
+			if variable.Domain.Size() == 0 {
 				return assignment, false
 			}
 

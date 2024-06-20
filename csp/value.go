@@ -35,6 +35,16 @@ func (s ValueSet) Remove(value Value) ValueSet {
 	return s
 }
 
+func (s ValueSet) RemoveAllBut(valueToKeep Value) ValueSet {
+	for i := 0; i < s.Size(); i++ {
+		if s[i] == valueToKeep {
+			s[0], s[i] = s[i], s[0]
+			return s[:1]
+		}
+	}
+	return s
+}
+
 func (s ValueSet) Add(value Value) ValueSet {
 	if s.Contains(value) {
 		return s
