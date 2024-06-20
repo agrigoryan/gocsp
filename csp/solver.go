@@ -78,28 +78,27 @@ func (s *SimpleSolver) solveAssignment(assignment Assignment, constraints []Cons
 	}
 
 	varIdx := s.variableSelector.SelectNextVariable(assignment)
-	domain := assignment.Domains[varIdx]
-	origDomain := domain.ShallowCopy()
+	origDomain := assignment.Domains[varIdx]
 
-	for domain.Size() > 0 {
+	for assignment.Domains[varIdx].Size() > 0 {
 		value := s.valueSelector.SelectVariableValue(assignment, varIdx)
-		assignedVar := assignment.Variables[varIdx].Assign(value)
-		assignment.Variables[varIdx] = assignedVar
-		if !assignment.IsConsistent(assignedVar.Constraints) {
-			domain.Remove(value)
+		assignment.Variables[varIdx] = assignment.Variables[varIdx].Assign(value)
+		if !assignment.IsConsistent(assignment.Variables[varIdx].Constraints) {
+			assignment.Domains[varIdx] = assignment.Domains[varIdx].Remove(value)
 			continue
 		}
 
-		updatedAssignment, ok := s.inference.Inference(assignment, varIdx)
+		updatedAssignment, ok := s.inference.Inference(assignment, constraints, varIdx)
 		if ok {
 			assignment = updatedAssignment
 			res := s.solveAssignment(assignment, constraints)
 			if res != nil {
+				assignment.Domains[varIdx] = assignment.Domains[varIdx].RemoveAllBut(value)
 				return res
 			}
 		}
 
-		domain.Remove(value)
+		assignment.Domains[varIdx] = assignment.Domains[varIdx].Remove(value)
 	}
 
 	assignment.Variables[varIdx] = assignment.Variables[varIdx].Unassign()
