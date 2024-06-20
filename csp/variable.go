@@ -48,3 +48,13 @@ func (v *Variable) String() string {
 	}
 	return builder.String()
 }
+
+func (v *Variable) Copy() Variable {
+	return Variable{
+		Index:       v.Index,
+		Value:       v.Value,
+		Assigned:    v.Assigned,
+		Constraints: v.Constraints,
+		Domain:      v.Domain,
+	}
+}
