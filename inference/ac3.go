@@ -41,9 +41,6 @@ func (q *arcQueue) empty() bool {
 
 func ac3Revise(assignment csp.Assignment, a *arc) bool {
 	vx, vy := assignment.Variable(a.x), assignment.Variable(a.y)
-	if vx.Assigned {
-		panic("BOOO")
-	}
 
 	revised := false
 
@@ -79,7 +76,9 @@ func ac3Revise(assignment csp.Assignment, a *arc) bool {
 
 var AC3 csp.InferenceFunc = func(assignment csp.Assignment, constraints []csp.Constraint, varIdx int) (csp.Assignment, bool) {
 	as := assignment.Copy()
-	//constraints = as.Variables[varIdx].Constraints
+
+	// optionally limit the initial set of arcs to the constraints of the newly assigned variable
+	constraints = as.Variable(varIdx).Constraints
 
 	// initially populate the queue with the arcs of the newly assigned variable
 	queue := arcQueue{}

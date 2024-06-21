@@ -92,10 +92,9 @@ func (s *SimpleSolver) solveAssignment(assignment Assignment, constraints []Cons
 
 		updatedAssignment, ok := s.inference.Inference(assignment, constraints, varIdx)
 		if ok {
-			assignment = updatedAssignment
-			res := s.solveAssignment(assignment, constraints)
+			//assignment = updatedAssignment
+			res := s.solveAssignment(updatedAssignment, constraints)
 			if res != nil {
-				assignment.Variable(varIdx).Domain.RemoveAllBut(value)
 				return res
 			}
 		}

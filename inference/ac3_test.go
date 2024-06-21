@@ -24,7 +24,7 @@ func BenchmarkAusMapWithAC3(b *testing.B) {
 }
 
 func TestNQueensWithAC3(t *testing.T) {
-	problem := problems.NQueens(6)
+	problem := problems.NQueens(20)
 	solver := csp.NewSimpleSolver(csp.NextUnassignedVariableSelector, csp.FirstDomainValueSelector, AC3)
 
 	result := solver.Solve(problem)
