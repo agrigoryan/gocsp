@@ -32,14 +32,6 @@ func (a Assignment) Variable(idx int) *Variable {
 	return &a.Variables[idx]
 }
 
-func (a Assignment) Domain(idx int) Domain {
-	return a.Variables[idx].Domain
-}
-
-func (a Assignment) SetDomain(idx int, domain Domain) {
-	a.Variables[idx].Domain = domain
-}
-
 func (a Assignment) AssignedValue(idx int) (Value, bool) {
 	return a.Variables[idx].Value, a.Variables[idx].Assigned
 }

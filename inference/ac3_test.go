@@ -23,6 +23,21 @@ func BenchmarkAusMapWithAC3(b *testing.B) {
 	benchWithAC3(problem, b)
 }
 
+func TestNQueensWithAC3(t *testing.T) {
+	problem := problems.NQueens(6)
+	solver := csp.NewSimpleSolver(csp.NextUnassignedVariableSelector, csp.FirstDomainValueSelector, AC3)
+
+	result := solver.Solve(problem)
+
+	fmt.Println(result)
+	assert.NotNil(t, result)
+}
+
+func BenchmarkNQueensWithAC3(b *testing.B) {
+	problem := problems.NQueens(20)
+	benchWithAC3(problem, b)
+}
+
 func benchWithAC3(problem csp.CSP, b *testing.B) {
 	for i := 0; i < b.N; i++ {
 		problem = csp.NewGenericCSP(problem.Domains(), problem.Constraints())

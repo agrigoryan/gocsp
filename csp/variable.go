@@ -20,22 +20,13 @@ func (v *Variable) Assign(value Value) {
 }
 
 func (v *Variable) AssignAndReduceDomain(value Value) {
-	v.Value = value
-	v.Assigned = true
-	v.RemoveRestFromDomain(value)
+	v.Assign(value)
+	v.Domain.RemoveAllBut(value)
 }
 
 func (v *Variable) Unassign() {
 	v.Value = 0
 	v.Assigned = false
-}
-
-func (v *Variable) RemoveFromDomain(value Value) {
-	v.Domain = v.Domain.Remove(value)
-}
-
-func (v *Variable) RemoveRestFromDomain(valueToKeep Value) {
-	v.Domain = v.Domain.RemoveAllBut(valueToKeep)
 }
 
 func (v *Variable) String() string {

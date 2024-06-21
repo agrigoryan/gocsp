@@ -51,7 +51,7 @@ func (f ValueSelectorFunc) SelectVariableValue(assignment Assignment, varIndex i
 }
 
 var FirstDomainValueSelector ValueSelectorFunc = func(assignment Assignment, varIndex int) Value {
-	return assignment.Domain(varIndex).Values()[0]
+	return assignment.Variable(varIndex).Domain.Value(0)
 }
 
 // Solver - generic interface to solve CSP
@@ -69,7 +69,8 @@ func (s *SimpleSolver) Solve(csp CSP) []Value {
 	assignment := Assignment{
 		Variables: createVariables(csp),
 	}
-	return s.solveAssignment(assignment, csp.Constraints())
+	res := s.solveAssignment(assignment, csp.Constraints())
+	return res
 }
 
 func (s *SimpleSolver) solveAssignment(assignment Assignment, constraints []Constraint) []Value {
@@ -78,14 +79,14 @@ func (s *SimpleSolver) solveAssignment(assignment Assignment, constraints []Cons
 	}
 
 	varIdx := s.variableSelector.SelectNextVariable(assignment)
-	origDomain := assignment.Domain(varIdx)
+	origDomain := assignment.Variable(varIdx).Domain.Copy()
 
-	for assignment.Domain(varIdx).Size() > 0 {
+	for assignment.Variable(varIdx).Domain.Size() > 0 {
 		value := s.valueSelector.SelectVariableValue(assignment, varIdx)
 		variable := assignment.Variable(varIdx)
 		variable.Assign(value)
 		if !assignment.IsConsistent(variable.Constraints) {
-			variable.RemoveFromDomain(value)
+			variable.Domain.Remove(value)
 			continue
 		}
 
@@ -94,12 +95,12 @@ func (s *SimpleSolver) solveAssignment(assignment Assignment, constraints []Cons
 			assignment = updatedAssignment
 			res := s.solveAssignment(assignment, constraints)
 			if res != nil {
-				assignment.Variable(varIdx).RemoveRestFromDomain(value)
+				assignment.Variable(varIdx).Domain.RemoveAllBut(value)
 				return res
 			}
 		}
 
-		assignment.Variable(varIdx).RemoveFromDomain(value)
+		assignment.Variable(varIdx).Domain.Remove(value)
 	}
 
 	variable := assignment.Variable(varIdx)

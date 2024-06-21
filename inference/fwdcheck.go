@@ -12,21 +12,20 @@ var FwdCheck csp.InferenceFunc = func(assignment csp.Assignment, constraints []c
 			if in == varIdx {
 				continue
 			}
-			if a.Variables[in].Assigned {
+			neighborVar := a.Variable(in)
+			if neighborVar.Assigned {
 				continue
 			}
-			nDomain := a.Domain(in)
-			for di := 0; di < nDomain.Size(); di++ {
-				val := nDomain.Values()[di]
-				a.Variable(in).Assign(val)
+			for di := 0; di < neighborVar.Domain.Size(); di++ {
+				val := neighborVar.Domain.Value(di)
+				neighborVar.Assign(val)
 				if !c.IsSatisfied(assignment) {
-					nDomain = nDomain.Remove(val)
-					a.SetDomain(in, nDomain)
+					neighborVar.Domain.Remove(val)
 					di--
 				}
 			}
-			a.Variable(in).Unassign()
-			if nDomain.Size() == 0 {
+			neighborVar.Unassign()
+			if neighborVar.Domain.Size() == 0 {
 				return assignment, false
 			}
 		}

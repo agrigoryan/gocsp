@@ -3,43 +3,76 @@ package inference
 import "github.com/agrigoryan/gocsp/csp"
 
 type arc struct {
-	s, t int
+	x, y int
 	c    csp.Constraint
+	next *arc
 }
 
-func ac3Revise(assignment csp.Assignment, a arc) bool {
-	idx1, idx2 := a.s, a.t
-	v1, v2 := assignment.Variable(idx1), assignment.Variable(idx2)
-	d1, d2 := v1.Domain, v2.Domain
+type arcQueue struct {
+	head *arc
+	tail *arc
+}
+
+func (q *arcQueue) push(a *arc) {
+	if q.head == nil {
+		q.head = a
+	}
+	if q.tail != nil {
+		q.tail.next = a
+	}
+	q.tail = a
+}
+
+func (q *arcQueue) shift() *arc {
+	if q.head == nil {
+		return nil
+	}
+	a := q.head
+	q.head = a.next
+	if q.tail == a {
+		q.tail = nil
+	}
+	return a
+}
+
+func (q *arcQueue) empty() bool {
+	return q.head == nil
+}
+
+func ac3Revise(assignment csp.Assignment, a *arc) bool {
+	vx, vy := assignment.Variable(a.x), assignment.Variable(a.y)
+	if vx.Assigned {
+		panic("BOOO")
+	}
 
 	revised := false
 
 	var di, dj csp.Value
-	for i := 0; i < d1.Size(); i++ {
-		di = d1.Values()[i]
-		v1.Assign(di)
+	for i := 0; i < vx.Domain.Size(); i++ {
+		di = vx.Domain.Value(i)
+		vx.Assign(di)
 		anyValueSatisfiesArc := false
-		if v2.Assigned {
+		if vy.Assigned {
 			anyValueSatisfiesArc = a.c.IsSatisfied(assignment)
 		} else {
-			for j := 0; j < d2.Size(); j++ {
-				dj = d2.Values()[j]
-				v2.Assign(dj)
-				arcSatisfied := a.c.IsSatisfied(assignment)
-				v2.Unassign()
-				if arcSatisfied {
+			for j := 0; j < vy.Domain.Size(); j++ {
+				dj = vy.Domain.Value(j)
+				vy.Assign(dj)
+				if a.c.IsSatisfied(assignment) {
 					anyValueSatisfiesArc = true
 					break
 				}
 			}
+			vy.Unassign()
 		}
 		if !anyValueSatisfiesArc {
-			v1.RemoveFromDomain(di)
+			vx.Domain.Remove(di)
+			i--
 			revised = true
 		}
 	}
 
-	v1.Unassign()
+	vx.Unassign()
 
 	return revised
 }
@@ -49,18 +82,24 @@ var AC3 csp.InferenceFunc = func(assignment csp.Assignment, constraints []csp.Co
 	//constraints = as.Variables[varIdx].Constraints
 
 	// initially populate the queue with the arcs of the newly assigned variable
-	queue := make([]arc, 0, 2*len(constraints))
+	queue := arcQueue{}
+
 	for _, c := range constraints {
+		if !c.IsBinaryConstraint() {
+			continue
+		}
 		cIndices := c.AppliesTo()
-		if c.IsBinaryConstraint() && !as.Variable(cIndices[0]).Assigned {
-			queue = append(queue, arc{s: cIndices[0], t: cIndices[1], c: c}, arc{s: cIndices[1], t: cIndices[0], c: c})
+		if !as.Variable(cIndices[0]).Assigned {
+			queue.push(&arc{x: cIndices[0], y: cIndices[1], c: c})
+		}
+		if !as.Variable(cIndices[1]).Assigned {
+			queue.push(&arc{x: cIndices[1], y: cIndices[0], c: c})
 		}
 	}
 
-	for len(queue) > 0 {
-		a := queue[0]
-		queue = queue[1:]
-		varIdx := a.s
+	for !queue.empty() {
+		a := queue.shift()
+		varIdx := a.x
 		variable := as.Variable(varIdx)
 
 		if ac3Revise(as, a) {
@@ -69,15 +108,18 @@ var AC3 csp.InferenceFunc = func(assignment csp.Assignment, constraints []csp.Co
 			}
 
 			var c csp.Constraint
-			for i := 0; i < len(as.Variables[varIdx].Constraints); i++ {
-				c = as.Variables[varIdx].Constraints[i]
+			for i := 0; i < len(variable.Constraints); i++ {
+				c = variable.Constraints[i]
+				if !c.IsBinaryConstraint() {
+					continue
+				}
 				cIndices := c.AppliesTo()
 				neighborIdx := cIndices[0]
 				if neighborIdx == varIdx {
 					neighborIdx = cIndices[1]
 				}
-				if neighborIdx != a.t && c.IsBinaryConstraint() && !as.Variable(neighborIdx).Assigned {
-					queue = append(queue, arc{s: neighborIdx, t: varIdx, c: c})
+				if neighborIdx != a.y && !as.Variable(neighborIdx).Assigned {
+					queue.push(&arc{x: neighborIdx, y: varIdx, c: c})
 				}
 			}
 		}
