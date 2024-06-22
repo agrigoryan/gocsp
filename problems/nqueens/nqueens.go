@@ -1,4 +1,4 @@
-package problems
+package nqueens
 
 import (
 	"github.com/agrigoryan/gocsp/csp"
@@ -12,7 +12,7 @@ func abs(x int) int {
 	return x
 }
 
-func NQueens(n int) *csp.GenericCSP {
+func New(n int) *csp.GenericCSP {
 	domains := make([]csp.Domain, n)
 	values := make([]csp.Value, n)
 	constraints := make([]csp.Constraint, 0, n*(n-1))

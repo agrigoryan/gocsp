@@ -3,13 +3,14 @@ package inference
 import (
 	"fmt"
 	"github.com/agrigoryan/gocsp/csp"
-	"github.com/agrigoryan/gocsp/problems"
+	"github.com/agrigoryan/gocsp/problems/asumap"
+	"github.com/agrigoryan/gocsp/problems/nqueens"
 	"github.com/stretchr/testify/assert"
 	"testing"
 )
 
 func TestAusMapWithFwdCheck(t *testing.T) {
-	problem := problems.AusMap()
+	problem := asumap.New()
 	solver := csp.NewSimpleSolver(csp.NextUnassignedVariableSelector, csp.FirstDomainValueSelector, FwdCheck)
 
 	result := solver.Solve(problem)
@@ -19,12 +20,12 @@ func TestAusMapWithFwdCheck(t *testing.T) {
 }
 
 func BenchmarkAusMapWithFwdCheck(b *testing.B) {
-	problem := problems.AusMap()
+	problem := asumap.New()
 	benchWithFwdCheck(problem, b)
 }
 
 func TestNQueensWithFwdCheck(t *testing.T) {
-	problem := problems.NQueens(25)
+	problem := nqueens.New(25)
 	solver := csp.NewSimpleSolver(csp.NextUnassignedVariableSelector, csp.FirstDomainValueSelector, FwdCheck)
 
 	result := solver.Solve(problem)
@@ -35,7 +36,7 @@ func TestNQueensWithFwdCheck(t *testing.T) {
 }
 
 func BenchmarkNQueensWithFwdCheck(b *testing.B) {
-	problem := problems.NQueens(25)
+	problem := nqueens.New(25)
 	benchWithFwdCheck(problem, b)
 }
 

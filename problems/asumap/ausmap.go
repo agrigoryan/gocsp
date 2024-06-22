@@ -1,8 +1,8 @@
-package problems
+package asumap
 
 import "github.com/agrigoryan/gocsp/csp"
 
-func AusMap() *csp.GenericCSP {
+func New() *csp.GenericCSP {
 	states := []string{"WA", "NT", "SA", "Q", "NSW", "V", "T"}
 	domains := make([]csp.Domain, len(states))
 	for i := range states {

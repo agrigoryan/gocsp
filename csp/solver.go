@@ -2,7 +2,7 @@ package csp
 
 import "math"
 
-// VariableSelector - a strategy to pick the next variable to assign
+// VariableSelector - a heuristic to pick the next variable to assign
 type VariableSelector interface {
 	SelectNextVariable(assignment Assignment) int
 }
@@ -39,7 +39,7 @@ var MRVVariableSelector VariableSelectorFunc = func(assignment Assignment) int {
 	return varIdx
 }
 
-// ValueSelector - a strategy to pick value to assign to a variable
+// ValueSelector - a heuristic to pick value to assign to a variable
 type ValueSelector interface {
 	SelectVariableValue(assigment Assignment, varIndex int) Value
 }

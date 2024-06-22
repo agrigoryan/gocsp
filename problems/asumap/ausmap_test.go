@@ -1,4 +1,4 @@
-package problems
+package asumap
 
 import (
 	"fmt"
@@ -7,9 +7,8 @@ import (
 	"testing"
 )
 
-func TestNQueensSolver(t *testing.T) {
-	problem := NQueens(10)
-
+func TestAusMapSolving(t *testing.T) {
+	problem := New()
 	solver := csp.NewSimpleSolver(csp.NextUnassignedVariableSelector, csp.FirstDomainValueSelector, csp.NoInferenceFunc)
 
 	result := solver.Solve(problem)

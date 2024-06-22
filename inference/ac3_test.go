@@ -3,13 +3,14 @@ package inference
 import (
 	"fmt"
 	"github.com/agrigoryan/gocsp/csp"
-	"github.com/agrigoryan/gocsp/problems"
+	"github.com/agrigoryan/gocsp/problems/asumap"
+	"github.com/agrigoryan/gocsp/problems/nqueens"
 	"github.com/stretchr/testify/assert"
 	"testing"
 )
 
 func TestAusMapWithAC3(t *testing.T) {
-	problem := problems.AusMap()
+	problem := asumap.New()
 	solver := csp.NewSimpleSolver(csp.NextUnassignedVariableSelector, csp.FirstDomainValueSelector, AC3)
 
 	result := solver.Solve(problem)
@@ -19,12 +20,12 @@ func TestAusMapWithAC3(t *testing.T) {
 }
 
 func BenchmarkAusMapWithAC3(b *testing.B) {
-	problem := problems.AusMap()
+	problem := asumap.New()
 	benchWithAC3(problem, b)
 }
 
 func TestNQueensWithAC3(t *testing.T) {
-	problem := problems.NQueens(20)
+	problem := nqueens.New(20)
 	solver := csp.NewSimpleSolver(csp.NextUnassignedVariableSelector, csp.FirstDomainValueSelector, AC3)
 
 	result := solver.Solve(problem)
@@ -34,7 +35,7 @@ func TestNQueensWithAC3(t *testing.T) {
 }
 
 func BenchmarkNQueensWithAC3(b *testing.B) {
-	problem := problems.NQueens(20)
+	problem := nqueens.New(20)
 	benchWithAC3(problem, b)
 }
 
