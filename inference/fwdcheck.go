@@ -3,8 +3,8 @@ package inference
 import "github.com/agrigoryan/gocsp/csp"
 
 var FwdCheck csp.InferenceFunc = func(assignment csp.Assignment, constraints []csp.Constraint, varIdx int) (csp.Assignment, bool) {
-	a := assignment.Copy()
-	assignedVar := a.Variable(varIdx)
+	assignment = assignment.Copy()
+	assignedVar := assignment.Variable(varIdx)
 	for ic := 0; ic < len(assignedVar.Constraints); ic++ {
 		c := assignedVar.Constraints[ic]
 		neighborIndices := c.AppliesTo()
@@ -12,7 +12,7 @@ var FwdCheck csp.InferenceFunc = func(assignment csp.Assignment, constraints []c
 			if in == varIdx {
 				continue
 			}
-			neighborVar := a.Variable(in)
+			neighborVar := assignment.Variable(in)
 			if neighborVar.Assigned {
 				continue
 			}
@@ -30,5 +30,5 @@ var FwdCheck csp.InferenceFunc = func(assignment csp.Assignment, constraints []c
 			}
 		}
 	}
-	return a, true
+	return assignment, true
 }

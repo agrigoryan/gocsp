@@ -90,16 +90,17 @@ func (s *SimpleSolver) solveAssignment(assignment Assignment, constraints []Cons
 			continue
 		}
 
-		updatedAssignment, ok := s.inference.Inference(assignment, constraints, varIdx)
-		if ok {
-			//assignment = updatedAssignment
-			res := s.solveAssignment(updatedAssignment, constraints)
-			if res != nil {
-				return res
-			}
+		inferredAssignment, ok := s.inference.Inference(assignment, constraints, varIdx)
+		if !ok {
+			variable.Domain.Remove(value)
+			continue
 		}
 
-		assignment.Variable(varIdx).Domain.Remove(value)
+		if res := s.solveAssignment(inferredAssignment, constraints); res != nil {
+			return res
+		}
+
+		variable.Domain.Remove(value)
 	}
 
 	variable := assignment.Variable(varIdx)

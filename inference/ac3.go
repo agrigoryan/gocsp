@@ -75,10 +75,9 @@ func ac3Revise(assignment csp.Assignment, a *arc) bool {
 }
 
 var AC3 csp.InferenceFunc = func(assignment csp.Assignment, constraints []csp.Constraint, varIdx int) (csp.Assignment, bool) {
-	as := assignment.Copy()
-
+	assignment = assignment.Copy()
 	// optionally limit the initial set of arcs to the constraints of the newly assigned variable
-	constraints = as.Variable(varIdx).Constraints
+	constraints = assignment.Variable(varIdx).Constraints
 
 	// initially populate the queue with the arcs of the newly assigned variable
 	queue := arcQueue{}
@@ -88,10 +87,10 @@ var AC3 csp.InferenceFunc = func(assignment csp.Assignment, constraints []csp.Co
 			continue
 		}
 		cIndices := c.AppliesTo()
-		if !as.Variable(cIndices[0]).Assigned {
+		if !assignment.Variable(cIndices[0]).Assigned {
 			queue.push(&arc{x: cIndices[0], y: cIndices[1], c: c})
 		}
-		if !as.Variable(cIndices[1]).Assigned {
+		if !assignment.Variable(cIndices[1]).Assigned {
 			queue.push(&arc{x: cIndices[1], y: cIndices[0], c: c})
 		}
 	}
@@ -99,9 +98,9 @@ var AC3 csp.InferenceFunc = func(assignment csp.Assignment, constraints []csp.Co
 	for !queue.empty() {
 		a := queue.shift()
 		varIdx := a.x
-		variable := as.Variable(varIdx)
+		variable := assignment.Variable(varIdx)
 
-		if ac3Revise(as, a) {
+		if ac3Revise(assignment, a) {
 			if variable.Domain.Size() == 0 {
 				return assignment, false
 			}
@@ -117,12 +116,12 @@ var AC3 csp.InferenceFunc = func(assignment csp.Assignment, constraints []csp.Co
 				if neighborIdx == varIdx {
 					neighborIdx = cIndices[1]
 				}
-				if neighborIdx != a.y && !as.Variable(neighborIdx).Assigned {
+				if neighborIdx != a.y && !assignment.Variable(neighborIdx).Assigned {
 					queue.push(&arc{x: neighborIdx, y: varIdx, c: c})
 				}
 			}
 		}
 	}
 
-	return as, true
+	return assignment, true
 }
