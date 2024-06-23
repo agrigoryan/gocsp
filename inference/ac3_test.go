@@ -11,7 +11,7 @@ import (
 
 func TestAusMapWithAC3(t *testing.T) {
 	problem := asumap.New()
-	solver := csp.NewSimpleSolver(csp.NextUnassignedVariableSelector, csp.FirstDomainValueSelector, AC3)
+	solver := csp.NewBacktrackingSolver(csp.NextUnassignedVariableSelector, csp.FirstDomainValueSelector, AC3)
 
 	result := solver.Solve(problem)
 
@@ -26,7 +26,7 @@ func BenchmarkAusMapWithAC3(b *testing.B) {
 
 func TestNQueensWithAC3(t *testing.T) {
 	problem := nqueens.New(20)
-	solver := csp.NewSimpleSolver(csp.NextUnassignedVariableSelector, csp.FirstDomainValueSelector, AC3)
+	solver := csp.NewBacktrackingSolver(csp.NextUnassignedVariableSelector, csp.FirstDomainValueSelector, AC3)
 
 	result := solver.Solve(problem)
 
@@ -42,7 +42,7 @@ func BenchmarkNQueensWithAC3(b *testing.B) {
 func benchWithAC3(problem csp.CSP, b *testing.B) {
 	for i := 0; i < b.N; i++ {
 		problem = csp.NewGenericCSP(problem.Domains(), problem.Constraints())
-		solver := csp.NewSimpleSolver(csp.NextUnassignedVariableSelector, csp.FirstDomainValueSelector, AC3)
+		solver := csp.NewBacktrackingSolver(csp.NextUnassignedVariableSelector, csp.FirstDomainValueSelector, AC3)
 		assert.NotNil(b, solver.Solve(problem))
 	}
 }

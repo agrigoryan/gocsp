@@ -10,7 +10,7 @@ import (
 func TestNQueensSolver(t *testing.T) {
 	problem := New(10)
 
-	solver := csp.NewSimpleSolver(csp.NextUnassignedVariableSelector, csp.FirstDomainValueSelector, csp.NoInferenceFunc)
+	solver := csp.NewBacktrackingSolver(csp.NextUnassignedVariableSelector, csp.FirstDomainValueSelector, csp.NoInferenceFunc)
 
 	result := solver.Solve(problem)
 

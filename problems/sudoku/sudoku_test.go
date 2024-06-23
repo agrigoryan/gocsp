@@ -27,7 +27,7 @@ func TestSudokuSolver(t *testing.T) {
 	fmt.Println(board)
 
 	problem := New(board)
-	solver := csp.NewSimpleSolver(csp.MRVVariableSelector, csp.FirstDomainValueSelector, csp.NoInferenceFunc)
+	solver := csp.NewBacktrackingSolver(csp.MRVVariableSelector, csp.FirstDomainValueSelector, csp.NoInferenceFunc)
 	result := solver.Solve(problem)
 
 	assert.NotNil(t, result)

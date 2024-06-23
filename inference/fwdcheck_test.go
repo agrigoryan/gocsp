@@ -11,7 +11,7 @@ import (
 
 func TestAusMapWithFwdCheck(t *testing.T) {
 	problem := asumap.New()
-	solver := csp.NewSimpleSolver(csp.NextUnassignedVariableSelector, csp.FirstDomainValueSelector, FwdCheck)
+	solver := csp.NewBacktrackingSolver(csp.NextUnassignedVariableSelector, csp.FirstDomainValueSelector, FwdCheck)
 
 	result := solver.Solve(problem)
 
@@ -26,7 +26,7 @@ func BenchmarkAusMapWithFwdCheck(b *testing.B) {
 
 func TestNQueensWithFwdCheck(t *testing.T) {
 	problem := nqueens.New(25)
-	solver := csp.NewSimpleSolver(csp.NextUnassignedVariableSelector, csp.FirstDomainValueSelector, FwdCheck)
+	solver := csp.NewBacktrackingSolver(csp.NextUnassignedVariableSelector, csp.FirstDomainValueSelector, FwdCheck)
 
 	result := solver.Solve(problem)
 
@@ -43,7 +43,7 @@ func BenchmarkNQueensWithFwdCheck(b *testing.B) {
 func benchWithFwdCheck(problem csp.CSP, b *testing.B) {
 	for i := 0; i < b.N; i++ {
 		problem = csp.NewGenericCSP(problem.Domains(), problem.Constraints())
-		solver := csp.NewSimpleSolver(csp.NextUnassignedVariableSelector, csp.FirstDomainValueSelector, FwdCheck)
+		solver := csp.NewBacktrackingSolver(csp.NextUnassignedVariableSelector, csp.FirstDomainValueSelector, FwdCheck)
 		assert.NotNil(b, solver.Solve(problem))
 	}
 }
