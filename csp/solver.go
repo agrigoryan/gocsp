@@ -1,6 +1,8 @@
 package csp
 
-import "math"
+import (
+	"math"
+)
 
 // VariableSelector - a heuristic to pick the next variable to assign
 type VariableSelector interface {
@@ -106,6 +108,51 @@ func (s *SimpleSolver) solveAssignment(assignment Assignment, constraints []Cons
 	variable := assignment.Variable(varIdx)
 	variable.Unassign()
 	variable.Domain = origDomain
+
+	return nil
+}
+
+func (s *SimpleSolver) solveAssignment2(assignment Assignment, constraints []Constraint) []Value {
+	stack := make([]Assignment, 0, 10)
+	stack = append(stack, assignment)
+
+	for len(stack) > 0 {
+		assignment = stack[len(stack)-1]
+		stack = stack[:len(stack)-1]
+
+		if assignment.IsComplete(constraints) {
+			return variableValues(assignment.Variables)
+		}
+
+		varIdx := s.variableSelector.SelectNextVariable(assignment)
+		variable := assignment.Variable(varIdx)
+		//origDomain := variable.Domain.Copy()
+
+		//fmt.Println(len(stack), varIdx)
+
+		for variable.Domain.Size() > 0 {
+			value := s.valueSelector.SelectVariableValue(assignment, varIdx)
+			variable.Assign(value)
+			variable.Domain.Remove(value)
+
+			if !assignment.IsConsistent(variable.Constraints) {
+				continue
+			}
+
+			inferredAssignment, ok := s.inference.Inference(assignment, constraints, varIdx)
+			if !ok {
+				continue
+			}
+
+			//stack = append(stack, inferredAssignment.Copy())
+			stack = append(stack, inferredAssignment)
+			variable.Unassign()
+		}
+
+		variable = assignment.Variable(varIdx)
+		variable.Unassign()
+		//variable.Domain = origDomain
+	}
 
 	return nil
 }
