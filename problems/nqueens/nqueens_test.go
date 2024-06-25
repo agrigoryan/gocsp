@@ -3,7 +3,6 @@ package nqueens
 import (
 	"fmt"
 	"github.com/agrigoryan/gocsp/csp"
-	"github.com/agrigoryan/gocsp/inference"
 	"github.com/stretchr/testify/assert"
 	"testing"
 )
@@ -11,7 +10,7 @@ import (
 func TestNQueensSolver(t *testing.T) {
 	problem := New(25)
 
-	solver := csp.NewBacktrackingSolver(csp.NextUnassignedVariableSelector, csp.FirstDomainValueSelector, inference.FwdCheck)
+	solver := csp.NewBacktrackingSolver(csp.NextUnassignedVariableSelector, csp.FirstDomainValueSelector, nil)
 
 	result := solver.Solve(problem)
 

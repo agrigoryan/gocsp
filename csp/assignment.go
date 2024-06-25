@@ -37,7 +37,7 @@ func (a Assignment) AssignedValue(idx int) (Value, bool) {
 func (a Assignment) Clone() Assignment {
 	clonedVars := make([]Variable, len(a.Variables))
 	for i, v := range a.Variables {
-		clonedVars[i] = v.Clone()
+		v.Copy(&clonedVars[i])
 	}
 	return Assignment{
 		Variables: clonedVars,

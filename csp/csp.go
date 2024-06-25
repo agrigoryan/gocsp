@@ -1,16 +1,16 @@
 package csp
 
 type CSP interface {
-	Domains() []Domain
+	Domains() []ValueSet
 	Constraints() []Constraint
 }
 
 type GenericCSP struct {
-	domains     []Domain
+	domains     []ValueSet
 	constraints []Constraint
 }
 
-func (c *GenericCSP) Domains() []Domain {
+func (c *GenericCSP) Domains() []ValueSet {
 	return c.domains
 }
 
@@ -18,7 +18,7 @@ func (c *GenericCSP) Constraints() []Constraint {
 	return c.constraints
 }
 
-func NewGenericCSP(domains []Domain, constraints []Constraint) *GenericCSP {
+func NewGenericCSP(domains []ValueSet, constraints []Constraint) *GenericCSP {
 	return &GenericCSP{
 		domains:     domains,
 		constraints: constraints,

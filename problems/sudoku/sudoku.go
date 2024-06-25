@@ -33,12 +33,12 @@ func sudokuConstraints() []csp.Constraint {
 }
 
 func New(board Board) *csp.GenericCSP {
-	domains := make([]csp.Domain, len(board))
+	domains := make([]csp.ValueSet, len(board))
 	for i := 0; i < 81; i++ {
 		if board[i] == 0 {
-			domains[i] = csp.NewDomain([]csp.Value{1, 2, 3, 4, 5, 6, 7, 8, 9})
+			domains[i] = csp.ValueSet{1, 2, 3, 4, 5, 6, 7, 8, 9}
 		} else {
-			domains[i] = csp.NewDomain([]csp.Value{csp.Value(board[i])})
+			domains[i] = csp.ValueSet{csp.Value(board[i])}
 		}
 	}
 

@@ -42,7 +42,7 @@ func BenchmarkNQueensWithAC3(b *testing.B) {
 func benchWithAC3(problem csp.CSP, b *testing.B) {
 	for i := 0; i < b.N; i++ {
 		problem = csp.NewGenericCSP(problem.Domains(), problem.Constraints())
-		solver := csp.NewBacktrackingSolver(csp.NextUnassignedVariableSelector, csp.FirstDomainValueSelector, AC3)
+		solver := csp.NewBacktrackingSolver(csp.NextUnassignedVariableSelector, csp.FirstDomainValueSelector, nil)
 		assert.NotNil(b, solver.Solve(problem))
 	}
 }

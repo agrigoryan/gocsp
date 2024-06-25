@@ -73,7 +73,7 @@ func createVariables(csp CSP) []Variable {
 		variables[i] = Variable{
 			Index:    i,
 			Assigned: false,
-			Domain:   d,
+			Domain:   NewDomain(d),
 		}
 	}
 

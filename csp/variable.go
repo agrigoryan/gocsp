@@ -44,3 +44,11 @@ func (v *Variable) Clone() Variable {
 		Domain:      v.Domain.Clone(),
 	}
 }
+
+func (v *Variable) Copy(other *Variable) {
+	other.Index = v.Index
+	other.Value = v.Value
+	other.Assigned = v.Assigned
+	other.Constraints = v.Constraints
+	other.Domain = v.Domain.Clone()
+}
