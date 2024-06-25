@@ -7,20 +7,27 @@ import (
 
 type Variable struct {
 	Index    int
-	Value    Value
+	ValueIdx int
 	Assigned bool
 
 	Constraints []Constraint
 	Domain      Domain
 }
 
-func (v *Variable) Assign(value Value) {
-	v.Value = value
+func (v *Variable) Value() (value Value) {
+	if v.Assigned {
+		value = v.Domain.Value(v.ValueIdx)
+	}
+	return value
+}
+
+func (v *Variable) Assign(idx int) {
+	v.ValueIdx = idx
 	v.Assigned = true
 }
 
 func (v *Variable) Unassign() {
-	v.Value = 0
+	v.ValueIdx = 0
 	v.Assigned = false
 }
 
@@ -28,7 +35,7 @@ func (v *Variable) String() string {
 	builder := &strings.Builder{}
 	builder.WriteString(fmt.Sprintf("variable %d: value=", v.Index))
 	if v.Assigned {
-		builder.WriteString(fmt.Sprintf("%d", v.Value))
+		builder.WriteString(fmt.Sprintf("%v", v.Domain.Value(v.ValueIdx)))
 	} else {
 		builder.WriteString("<none>")
 	}
@@ -38,7 +45,7 @@ func (v *Variable) String() string {
 func (v *Variable) Clone() Variable {
 	return Variable{
 		Index:       v.Index,
-		Value:       v.Value,
+		ValueIdx:    v.ValueIdx,
 		Assigned:    v.Assigned,
 		Constraints: v.Constraints,
 		Domain:      v.Domain.Clone(),
@@ -47,7 +54,7 @@ func (v *Variable) Clone() Variable {
 
 func (v *Variable) Copy(other *Variable) {
 	other.Index = v.Index
-	other.Value = v.Value
+	other.ValueIdx = v.ValueIdx
 	other.Assigned = v.Assigned
 	other.Constraints = v.Constraints
 	other.Domain = v.Domain.Clone()

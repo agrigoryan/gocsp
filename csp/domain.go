@@ -6,8 +6,11 @@ import (
 	"strconv"
 )
 
+type Value int
+type ValueSet []Value
+
 type Domain struct {
-	values ValueSet
+	values []Value
 	bitmap *bitset.BitSet
 }
 
@@ -19,20 +22,20 @@ func (d *Domain) Value(idx int) Value {
 	return d.values[idx]
 }
 
-func (d *Domain) Range(fn func(int, Value) bool) {
+func (d *Domain) Range(fn func(int) bool) {
 	for i := 0; i < len(d.values); i++ {
 		if d.bitmap.Test(uint(i)) {
-			if fn(i, d.values[i]) {
+			if fn(i) {
 				return
 			}
 		}
 	}
 }
 
-func (d *Domain) Filter(fn func(Value) bool) {
+func (d *Domain) Filter(fn func(int) bool) {
 	for i := 0; i < len(d.values); i++ {
 		if d.bitmap.Test(uint(i)) {
-			if !fn(d.values[i]) {
+			if !fn(i) {
 				d.bitmap.Clear(uint(i))
 			}
 		}
@@ -47,6 +50,10 @@ func (d *Domain) Unset(idx int) {
 	d.bitmap.Clear(uint(idx))
 }
 
+func (d *Domain) Contains(idx int) bool {
+	return d.bitmap.Test(uint(idx))
+}
+
 func (d *Domain) UnsetAllBut(idx int) {
 	d.bitmap.ClearAll()
 	d.bitmap.Set(uint(idx))
@@ -55,8 +62,8 @@ func (d *Domain) UnsetAllBut(idx int) {
 func (d *Domain) String() string {
 	buf := bytes.Buffer{}
 	buf.WriteByte('{')
-	d.Range(func(i int, value Value) bool {
-		buf.WriteString(strconv.Itoa(int(value)))
+	d.Range(func(i int) bool {
+		buf.WriteString(strconv.Itoa(int(d.values[i])))
 		return false
 	})
 	buf.WriteByte('}')

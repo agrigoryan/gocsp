@@ -44,14 +44,14 @@ func ac3Revise(assignment csp.Assignment, a *arc) bool {
 
 	revised := false
 
-	vx.Domain.Range(func(i int, di csp.Value) bool {
-		vx.Assign(di)
+	vx.Domain.Range(func(i int) bool {
+		vx.Assign(i)
 		anyValueSatisfiesArc := false
 		if vy.Assigned {
 			anyValueSatisfiesArc = a.c.IsSatisfied(assignment)
 		} else {
-			vy.Domain.Range(func(j int, dj csp.Value) bool {
-				vy.Assign(dj)
+			vy.Domain.Range(func(j int) bool {
+				vy.Assign(j)
 				if a.c.IsSatisfied(assignment) {
 					anyValueSatisfiesArc = true
 					return true

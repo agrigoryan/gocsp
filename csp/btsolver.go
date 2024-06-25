@@ -35,8 +35,7 @@ func (s *BacktrackingSolver) solveAssignment(assignment Assignment, constraints 
 
 	for variable.Domain.Size() > 0 {
 		valueIdx := s.valueSelector.SelectNextValue(assignment, varIdx)
-		value := variable.Domain.Value(valueIdx)
-		variable.Assign(value)
+		variable.Assign(valueIdx)
 		if !assignment.IsConsistent(variable.Constraints) {
 			variable.Domain.Unset(valueIdx)
 			continue
@@ -89,7 +88,7 @@ func createVariables(csp CSP) []Variable {
 func variableValues(variables []Variable) []Value {
 	result := make([]Value, len(variables))
 	for i := range variables {
-		result[i] = variables[i].Value
+		result[i] = variables[i].Value()
 	}
 	return result
 }

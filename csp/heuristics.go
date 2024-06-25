@@ -56,7 +56,7 @@ var FirstDomainValueSelector ValueSelectorFunc = func(assignment Assignment, var
 		panic("domain size is 0")
 	}
 	var idx int
-	variable.Domain.Range(func(i int, v Value) bool {
+	variable.Domain.Range(func(i int) bool {
 		idx = i
 		return true
 	})

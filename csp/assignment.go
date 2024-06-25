@@ -30,8 +30,8 @@ func (a Assignment) Variable(idx int) *Variable {
 	return &a.Variables[idx]
 }
 
-func (a Assignment) AssignedValue(idx int) (Value, bool) {
-	return a.Variables[idx].Value, a.Variables[idx].Assigned
+func (a Assignment) AssignedValueIdx(idx int) (int, bool) {
+	return a.Variables[idx].ValueIdx, a.Variables[idx].Assigned
 }
 
 func (a Assignment) Clone() Assignment {

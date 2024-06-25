@@ -15,8 +15,8 @@ var FwdCheck csp.InferenceFunc = func(assignment csp.Assignment, constraints []c
 			if neighborVar.Assigned {
 				continue
 			}
-			neighborVar.Domain.Filter(func(value csp.Value) bool {
-				neighborVar.Assign(value)
+			neighborVar.Domain.Filter(func(idx int) bool {
+				neighborVar.Assign(idx)
 				return c.IsSatisfied(assignment)
 			})
 			neighborVar.Unassign()
