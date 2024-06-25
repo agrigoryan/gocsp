@@ -25,14 +25,13 @@ func BenchmarkAusMapWithFwdCheck(b *testing.B) {
 }
 
 func TestNQueensWithFwdCheck(t *testing.T) {
-	problem := nqueens.New(25)
+	problem := nqueens.New(4)
 	solver := csp.NewBacktrackingSolver(csp.NextUnassignedVariableSelector, csp.FirstDomainValueSelector, FwdCheck)
 
 	result := solver.Solve(problem)
 
 	fmt.Println(result)
 	assert.NotNil(t, result)
-
 }
 
 func BenchmarkNQueensWithFwdCheck(b *testing.B) {

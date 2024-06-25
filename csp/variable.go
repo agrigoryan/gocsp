@@ -19,11 +19,6 @@ func (v *Variable) Assign(value Value) {
 	v.Assigned = true
 }
 
-func (v *Variable) AssignAndReduceDomain(value Value) {
-	v.Assign(value)
-	v.Domain.RemoveAllBut(value)
-}
-
 func (v *Variable) Unassign() {
 	v.Value = 0
 	v.Assigned = false
@@ -40,12 +35,12 @@ func (v *Variable) String() string {
 	return builder.String()
 }
 
-func (v *Variable) Copy() Variable {
+func (v *Variable) Clone() Variable {
 	return Variable{
 		Index:       v.Index,
 		Value:       v.Value,
 		Assigned:    v.Assigned,
 		Constraints: v.Constraints,
-		Domain:      v.Domain,
+		Domain:      v.Domain.Clone(),
 	}
 }

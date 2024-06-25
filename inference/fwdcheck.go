@@ -3,7 +3,6 @@ package inference
 import "github.com/agrigoryan/gocsp/csp"
 
 var FwdCheck csp.InferenceFunc = func(assignment csp.Assignment, constraints []csp.Constraint, varIdx int) (csp.Assignment, bool) {
-	assignment = assignment.Copy()
 	assignedVar := assignment.Variable(varIdx)
 	for ic := 0; ic < len(assignedVar.Constraints); ic++ {
 		c := assignedVar.Constraints[ic]
@@ -16,14 +15,10 @@ var FwdCheck csp.InferenceFunc = func(assignment csp.Assignment, constraints []c
 			if neighborVar.Assigned {
 				continue
 			}
-			for di := 0; di < neighborVar.Domain.Size(); di++ {
-				val := neighborVar.Domain.Value(di)
-				neighborVar.Assign(val)
-				if !c.IsSatisfied(assignment) {
-					neighborVar.Domain.Remove(val)
-					di--
-				}
-			}
+			neighborVar.Domain.Filter(func(value csp.Value) bool {
+				neighborVar.Assign(value)
+				return c.IsSatisfied(assignment)
+			})
 			neighborVar.Unassign()
 			if neighborVar.Domain.Size() == 0 {
 				return assignment, false

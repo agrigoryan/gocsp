@@ -9,7 +9,7 @@ import (
 
 func TestAusMapSolving(t *testing.T) {
 	problem := New()
-	solver := csp.NewBacktrackingSolver(csp.NextUnassignedVariableSelector, csp.FirstDomainValueSelector, csp.NoInferenceFunc)
+	solver := csp.NewBacktrackingSolver(csp.NextUnassignedVariableSelector, csp.FirstDomainValueSelector, nil)
 
 	result := solver.Solve(problem)
 

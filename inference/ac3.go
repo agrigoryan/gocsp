@@ -44,30 +44,28 @@ func ac3Revise(assignment csp.Assignment, a *arc) bool {
 
 	revised := false
 
-	var di, dj csp.Value
-	for i := 0; i < vx.Domain.Size(); i++ {
-		di = vx.Domain.Value(i)
+	vx.Domain.Range(func(i int, di csp.Value) bool {
 		vx.Assign(di)
 		anyValueSatisfiesArc := false
 		if vy.Assigned {
 			anyValueSatisfiesArc = a.c.IsSatisfied(assignment)
 		} else {
-			for j := 0; j < vy.Domain.Size(); j++ {
-				dj = vy.Domain.Value(j)
+			vy.Domain.Range(func(j int, dj csp.Value) bool {
 				vy.Assign(dj)
 				if a.c.IsSatisfied(assignment) {
 					anyValueSatisfiesArc = true
-					break
+					return true
 				}
-			}
+				return false
+			})
 			vy.Unassign()
 		}
 		if !anyValueSatisfiesArc {
-			vx.Domain.Remove(di)
-			i--
+			vx.Domain.Unset(i)
 			revised = true
 		}
-	}
+		return false
+	})
 
 	vx.Unassign()
 
@@ -75,7 +73,6 @@ func ac3Revise(assignment csp.Assignment, a *arc) bool {
 }
 
 var AC3 csp.InferenceFunc = func(assignment csp.Assignment, constraints []csp.Constraint, varIdx int) (csp.Assignment, bool) {
-	assignment = assignment.Copy()
 	// optionally limit the initial set of arcs to the constraints of the newly assigned variable
 	constraints = assignment.Variable(varIdx).Constraints
 

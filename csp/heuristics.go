@@ -41,15 +41,24 @@ var MRVVariableSelector VariableSelectorFunc = func(assignment Assignment) int {
 
 // ValueSelector - a heuristic to pick value to assign to a variable
 type ValueSelector interface {
-	SelectVariableValue(assigment Assignment, varIndex int) Value
+	SelectNextValue(assigment Assignment, varIndex int) int
 }
 
-type ValueSelectorFunc func(assignment Assignment, varIndex int) Value
+type ValueSelectorFunc func(assignment Assignment, varIndex int) int
 
-func (f ValueSelectorFunc) SelectVariableValue(assignment Assignment, varIndex int) Value {
+func (f ValueSelectorFunc) SelectNextValue(assignment Assignment, varIndex int) int {
 	return f(assignment, varIndex)
 }
 
-var FirstDomainValueSelector ValueSelectorFunc = func(assignment Assignment, varIndex int) Value {
-	return assignment.Variable(varIndex).Domain.Value(0)
+var FirstDomainValueSelector ValueSelectorFunc = func(assignment Assignment, varIndex int) int {
+	variable := assignment.Variable(varIndex)
+	if variable.Domain.Size() == 0 {
+		panic("domain size is 0")
+	}
+	var idx int
+	variable.Domain.Range(func(i int, v Value) bool {
+		idx = i
+		return true
+	})
+	return idx
 }

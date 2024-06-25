@@ -9,7 +9,3 @@ type InferenceFunc func(assignment Assignment, constraints []Constraint, varIdx 
 func (f InferenceFunc) Inference(assignment Assignment, constraints []Constraint, varIdx int) (Assignment, bool) {
 	return f(assignment, constraints, varIdx)
 }
-
-var NoInferenceFunc InferenceFunc = func(assignment Assignment, constraints []Constraint, varIdx int) (Assignment, bool) {
-	return assignment, true
-}

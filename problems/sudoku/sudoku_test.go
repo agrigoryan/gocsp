@@ -3,6 +3,7 @@ package sudoku
 import (
 	"fmt"
 	"github.com/agrigoryan/gocsp/csp"
+	"github.com/agrigoryan/gocsp/inference"
 	"github.com/stretchr/testify/assert"
 	"testing"
 )
@@ -27,7 +28,7 @@ func TestSudokuSolver(t *testing.T) {
 	fmt.Println(board)
 
 	problem := New(board)
-	solver := csp.NewBacktrackingSolver(csp.MRVVariableSelector, csp.FirstDomainValueSelector, csp.NoInferenceFunc)
+	solver := csp.NewBacktrackingSolver(csp.MRVVariableSelector, csp.FirstDomainValueSelector, inference.FwdCheck)
 	result := solver.Solve(problem)
 
 	assert.NotNil(t, result)
