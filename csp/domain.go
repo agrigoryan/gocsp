@@ -24,20 +24,16 @@ func (d *Domain) Value(idx int) Value {
 
 func (d *Domain) Range(fn func(int) bool) {
 	for i := 0; i < len(d.values); i++ {
-		if d.bitmap.Test(uint(i)) {
-			if fn(i) {
-				return
-			}
+		if d.bitmap.Test(uint(i)) && fn(i) {
+			return
 		}
 	}
 }
 
 func (d *Domain) Filter(fn func(int) bool) {
 	for i := 0; i < len(d.values); i++ {
-		if d.bitmap.Test(uint(i)) {
-			if !fn(i) {
-				d.bitmap.Clear(uint(i))
-			}
+		if d.bitmap.Test(uint(i)) && !fn(i) {
+			d.bitmap.Clear(uint(i))
 		}
 	}
 }
