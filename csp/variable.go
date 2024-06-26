@@ -11,14 +11,6 @@ type Variable struct {
 	Assigned bool
 
 	Constraints []Constraint
-	Domain      Domain
-}
-
-func (v *Variable) Value() (value Value) {
-	if v.Assigned {
-		value = v.Domain.Value(v.ValueIdx)
-	}
-	return value
 }
 
 func (v *Variable) Assign(idx int) {
@@ -35,7 +27,7 @@ func (v *Variable) String() string {
 	builder := &strings.Builder{}
 	builder.WriteString(fmt.Sprintf("variable %d: value=", v.Index))
 	if v.Assigned {
-		builder.WriteString(fmt.Sprintf("%v", v.Domain.Value(v.ValueIdx)))
+		builder.WriteString(fmt.Sprintf("%v", v.ValueIdx))
 	} else {
 		builder.WriteString("<none>")
 	}
@@ -48,7 +40,6 @@ func (v *Variable) Clone() Variable {
 		ValueIdx:    v.ValueIdx,
 		Assigned:    v.Assigned,
 		Constraints: v.Constraints,
-		Domain:      v.Domain.Clone(),
 	}
 }
 
@@ -57,5 +48,4 @@ func (v *Variable) Copy(other *Variable) {
 	other.ValueIdx = v.ValueIdx
 	other.Assigned = v.Assigned
 	other.Constraints = v.Constraints
-	other.Domain = v.Domain.Clone()
 }

@@ -23,7 +23,7 @@ func New(n int) *csp.GenericCSP {
 		domains[i] = slices.Clone(values)
 		for j := 0; j < n; j++ {
 			if j != i {
-				constraints = append(constraints, csp.NewConstraint([]int{i, j}, func(indices []int, assignment csp.Assignment) bool {
+				constraints = append(constraints, csp.NewConstraint([]int{i, j}, func(indices []int, assignment *csp.Assignment) bool {
 					v1, ok := assignment.AssignedValue(indices[0])
 					if !ok {
 						return true

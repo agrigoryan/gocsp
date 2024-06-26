@@ -39,7 +39,7 @@ func (q *arcQueue) empty() bool {
 	return q.head == nil
 }
 
-func ac3Revise(assignment csp.Assignment, a *arc) bool {
+func ac3Revise(assignment *csp.Assignment, a *arc) bool {
 	revised := false
 
 	assignment.RangeDomain(a.x, func(i int) bool {
@@ -70,7 +70,7 @@ func ac3Revise(assignment csp.Assignment, a *arc) bool {
 	return revised
 }
 
-var AC3 csp.InferenceFunc = func(assignment csp.Assignment, constraints []csp.Constraint, varIdx int) (csp.Assignment, bool) {
+var AC3 csp.InferenceFunc = func(assignment *csp.Assignment, constraints []csp.Constraint, varIdx int) (*csp.Assignment, bool) {
 	// optionally limit the initial set of arcs to the constraints of the newly assigned variable
 	constraints = assignment.Constraints(varIdx)
 

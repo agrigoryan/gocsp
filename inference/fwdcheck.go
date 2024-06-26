@@ -2,7 +2,7 @@ package inference
 
 import "github.com/agrigoryan/gocsp/csp"
 
-var FwdCheck csp.InferenceFunc = func(assignment csp.Assignment, constraints []csp.Constraint, varIdx int) (csp.Assignment, bool) {
+var FwdCheck csp.InferenceFunc = func(assignment *csp.Assignment, constraints []csp.Constraint, varIdx int) (*csp.Assignment, bool) {
 	for _, c := range assignment.Constraints(varIdx) {
 		neighborIndices := c.AppliesTo()
 		for in := 0; in < len(neighborIndices); in++ {

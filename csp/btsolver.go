@@ -1,7 +1,9 @@
 package csp
 
+import "fmt"
+
 type SolverProgressListener interface {
-	OnSolverProgress(assignment Assignment)
+	OnSolverProgress(assignment *Assignment)
 }
 
 type BacktrackingSolver struct {
@@ -13,25 +15,24 @@ type BacktrackingSolver struct {
 }
 
 func (s *BacktrackingSolver) Solve(csp CSP) []Value {
-	assignment := Assignment{
-		Variables: createVariables(csp),
-	}
+	assignment := createInitialAssignment(csp)
 	res := s.solveAssignment(assignment, csp.Constraints())
 	return res
 }
 
-func (s *BacktrackingSolver) solveAssignment(assignment Assignment, constraints []Constraint) []Value {
+func (s *BacktrackingSolver) solveAssignment(assignment *Assignment, constraints []Constraint) []Value {
 	if s.Listener != nil {
 		s.Listener.OnSolverProgress(assignment)
 	}
 
 	if assignment.IsComplete(constraints) {
-		return variableValues(assignment.Variables)
+		return variableValues(assignment)
 	}
 
 	varIdx := s.variableSelector.SelectNextVariable(assignment)
 	origDomain := assignment.Domain(varIdx).Clone()
 
+	fmt.Println(varIdx)
 	for assignment.DomainSize(varIdx) > 0 {
 		valueIdx := s.valueSelector.SelectNextValue(assignment, varIdx)
 		assignment.Assign(varIdx, valueIdx)
@@ -64,15 +65,17 @@ func (s *BacktrackingSolver) solveAssignment(assignment Assignment, constraints 
 	return nil
 }
 
-func createVariables(csp CSP) []Variable {
-	variables := make([]Variable, len(csp.Domains()))
+func createInitialAssignment(csp CSP) *Assignment {
+	numDomains := len(csp.Domains())
+	variables := make([]Variable, numDomains)
+	domains := make([]Domain, numDomains)
 
 	for i, d := range csp.Domains() {
 		variables[i] = Variable{
 			Index:    i,
 			Assigned: false,
-			Domain:   NewDomain(d),
 		}
+		domains[i] = NewDomain(d)
 	}
 
 	for _, c := range csp.Constraints() {
@@ -81,13 +84,16 @@ func createVariables(csp CSP) []Variable {
 		}
 	}
 
-	return variables
+	return &Assignment{
+		Variables: variables,
+		Domains:   domains,
+	}
 }
 
-func variableValues(variables []Variable) []Value {
-	result := make([]Value, len(variables))
-	for i := range variables {
-		result[i] = variables[i].Value()
+func variableValues(assignment *Assignment) []Value {
+	result := make([]Value, assignment.NumVariables())
+	for i := range result {
+		result[i], _ = assignment.AssignedValue(i)
 	}
 	return result
 }
