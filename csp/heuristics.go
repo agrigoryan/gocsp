@@ -27,7 +27,10 @@ var MRVVariableSelector VariableSelectorFunc = func(assignment *Assignment) int 
 	minDomainSize := math.MaxInt32
 	varIdx := -1
 	for i := 0; i < assignment.NumVariables(); i++ {
-		if !assignment.Assigned(i) && (varIdx == -1 || assignment.DomainSize(varIdx) < minDomainSize) {
+		if assignment.Assigned(i) {
+			continue
+		}
+		if varIdx == -1 || assignment.DomainSize(i) < minDomainSize {
 			varIdx = i
 			minDomainSize = assignment.DomainSize(varIdx)
 		}

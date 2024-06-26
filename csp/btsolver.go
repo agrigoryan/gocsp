@@ -1,7 +1,5 @@
 package csp
 
-import "fmt"
-
 type SolverProgressListener interface {
 	OnSolverProgress(assignment *Assignment)
 }
@@ -32,7 +30,6 @@ func (s *BacktrackingSolver) solveAssignment(assignment *Assignment, constraints
 	varIdx := s.variableSelector.SelectNextVariable(assignment)
 	origDomain := assignment.Domain(varIdx).Clone()
 
-	fmt.Println(varIdx)
 	for assignment.DomainSize(varIdx) > 0 {
 		valueIdx := s.valueSelector.SelectNextValue(assignment, varIdx)
 		assignment.Assign(varIdx, valueIdx)
