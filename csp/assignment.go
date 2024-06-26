@@ -1,5 +1,7 @@
 package csp
 
+import "slices"
+
 type Assignment struct {
 	Variables []Variable
 }
@@ -34,8 +36,12 @@ func (a Assignment) AssignedValueIdx(idx int) (int, bool) {
 	return a.Variables[idx].ValueIdx, a.Variables[idx].Assigned
 }
 
+func (a Assignment) AssignedValue(idx int) (Value, bool) {
+	return a.Variables[idx].Value(), a.Variables[idx].Assigned
+}
+
 func (a Assignment) Clone() Assignment {
-	clonedVars := make([]Variable, len(a.Variables))
+	clonedVars := slices.Clone(a.Variables)
 	for i, v := range a.Variables {
 		v.Copy(&clonedVars[i])
 	}

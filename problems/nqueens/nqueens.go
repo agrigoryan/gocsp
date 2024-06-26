@@ -24,11 +24,11 @@ func New(n int) *csp.GenericCSP {
 		for j := 0; j < n; j++ {
 			if j != i {
 				constraints = append(constraints, csp.NewConstraint([]int{i, j}, func(indices []int, assignment csp.Assignment) bool {
-					v1, ok := assignment.AssignedValueIdx(indices[0])
+					v1, ok := assignment.AssignedValue(indices[0])
 					if !ok {
 						return true
 					}
-					v2, ok := assignment.AssignedValueIdx(indices[1])
+					v2, ok := assignment.AssignedValue(indices[1])
 					if !ok {
 						return true
 					}

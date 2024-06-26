@@ -21,13 +21,13 @@ func (c Constraint) IsBinaryConstraint() bool {
 
 func AllDiffConstraintFunc(indices []int, assignment Assignment) bool {
 	for i := 0; i < len(indices); i++ {
-		val1Idx, ok := assignment.AssignedValueIdx(indices[i])
+		val1, ok := assignment.AssignedValue(indices[i])
 		if !ok {
 			continue
 		}
 		for j := i + 1; j < len(indices); j++ {
-			val2Idx, ok := assignment.AssignedValueIdx(indices[j])
-			if ok && val1Idx == val2Idx {
+			val2, ok := assignment.AssignedValue(indices[j])
+			if ok && val1 == val2 {
 				return false
 			}
 		}
