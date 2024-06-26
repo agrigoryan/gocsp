@@ -40,41 +40,39 @@ func (q *arcQueue) empty() bool {
 }
 
 func ac3Revise(assignment csp.Assignment, a *arc) bool {
-	vx, vy := assignment.Variable(a.x), assignment.Variable(a.y)
-
 	revised := false
 
-	vx.Domain.Range(func(i int) bool {
-		vx.Assign(i)
+	assignment.RangeDomain(a.x, func(i int) bool {
+		assignment.Assign(a.x, i)
 		anyValueSatisfiesArc := false
-		if vy.Assigned {
+		if assignment.Assigned(a.y) {
 			anyValueSatisfiesArc = a.c.IsSatisfied(assignment)
 		} else {
-			vy.Domain.Range(func(j int) bool {
-				vy.Assign(j)
+			assignment.RangeDomain(a.y, func(j int) bool {
+				assignment.Assign(a.y, j)
 				if a.c.IsSatisfied(assignment) {
 					anyValueSatisfiesArc = true
 					return true
 				}
 				return false
 			})
-			vy.Unassign()
+			assignment.Unassign(a.y)
 		}
 		if !anyValueSatisfiesArc {
-			vx.Domain.Unset(i)
+			assignment.Unset(a.x, i)
 			revised = true
 		}
 		return false
 	})
 
-	vx.Unassign()
+	assignment.Unassign(a.x)
 
 	return revised
 }
 
 var AC3 csp.InferenceFunc = func(assignment csp.Assignment, constraints []csp.Constraint, varIdx int) (csp.Assignment, bool) {
 	// optionally limit the initial set of arcs to the constraints of the newly assigned variable
-	constraints = assignment.Variable(varIdx).Constraints
+	constraints = assignment.Constraints(varIdx)
 
 	// initially populate the queue with the arcs of the newly assigned variable
 	queue := arcQueue{}
@@ -84,10 +82,10 @@ var AC3 csp.InferenceFunc = func(assignment csp.Assignment, constraints []csp.Co
 			continue
 		}
 		cIndices := c.AppliesTo()
-		if !assignment.Variable(cIndices[0]).Assigned {
+		if !assignment.Assigned(cIndices[0]) {
 			queue.push(&arc{x: cIndices[0], y: cIndices[1], c: c})
 		}
-		if !assignment.Variable(cIndices[1]).Assigned {
+		if !assignment.Assigned(cIndices[1]) {
 			queue.push(&arc{x: cIndices[1], y: cIndices[0], c: c})
 		}
 	}
@@ -95,16 +93,13 @@ var AC3 csp.InferenceFunc = func(assignment csp.Assignment, constraints []csp.Co
 	for !queue.empty() {
 		a := queue.shift()
 		varIdx := a.x
-		variable := assignment.Variable(varIdx)
 
 		if ac3Revise(assignment, a) {
-			if variable.Domain.Size() == 0 {
+			if assignment.DomainSize(varIdx) == 0 {
 				return assignment, false
 			}
 
-			var c csp.Constraint
-			for i := 0; i < len(variable.Constraints); i++ {
-				c = variable.Constraints[i]
+			for _, c := range assignment.Constraints(varIdx) {
 				if !c.IsBinaryConstraint() {
 					continue
 				}
@@ -113,7 +108,7 @@ var AC3 csp.InferenceFunc = func(assignment csp.Assignment, constraints []csp.Co
 				if neighborIdx == varIdx {
 					neighborIdx = cIndices[1]
 				}
-				if neighborIdx != a.y && !assignment.Variable(neighborIdx).Assigned {
+				if neighborIdx != a.y && !assignment.Assigned(neighborIdx) {
 					queue.push(&arc{x: neighborIdx, y: varIdx, c: c})
 				}
 			}

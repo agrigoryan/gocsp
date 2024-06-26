@@ -27,9 +27,8 @@ var MRVVariableSelector VariableSelectorFunc = func(assignment Assignment) int {
 	minDomainSize := math.MaxInt32
 	varIdx := -1
 	for i := 0; i < assignment.NumVariables(); i++ {
-		v := assignment.Variable(i)
-		if !v.Assigned && v.Domain.Size() < minDomainSize {
-			minDomainSize = v.Domain.Size()
+		if !assignment.Assigned(i) && assignment.DomainSize(varIdx) < minDomainSize {
+			minDomainSize = assignment.DomainSize(varIdx)
 			varIdx = i
 		}
 	}
@@ -50,13 +49,12 @@ func (f ValueSelectorFunc) SelectNextValue(assignment Assignment, varIndex int) 
 	return f(assignment, varIndex)
 }
 
-var FirstDomainValueSelector ValueSelectorFunc = func(assignment Assignment, varIndex int) int {
-	variable := assignment.Variable(varIndex)
-	if variable.Domain.Size() == 0 {
+var FirstDomainValueSelector ValueSelectorFunc = func(assignment Assignment, varIdx int) int {
+	if assignment.DomainSize(varIdx) == 0 {
 		panic("domain size is 0")
 	}
 	var idx int
-	variable.Domain.Range(func(i int) bool {
+	assignment.RangeDomain(varIdx, func(i int) bool {
 		idx = i
 		return true
 	})

@@ -30,14 +30,13 @@ func (s *BacktrackingSolver) solveAssignment(assignment Assignment, constraints 
 	}
 
 	varIdx := s.variableSelector.SelectNextVariable(assignment)
-	variable := assignment.Variable(varIdx)
-	origDomain := variable.Domain.Clone()
+	origDomain := assignment.Domain(varIdx).Clone()
 
-	for variable.Domain.Size() > 0 {
+	for assignment.DomainSize(varIdx) > 0 {
 		valueIdx := s.valueSelector.SelectNextValue(assignment, varIdx)
-		variable.Assign(valueIdx)
-		if !assignment.IsConsistent(variable.Constraints) {
-			variable.Domain.Unset(valueIdx)
+		assignment.Assign(varIdx, valueIdx)
+		if !assignment.IsConsistent(assignment.Constraints(varIdx)) {
+			assignment.Unset(varIdx, valueIdx)
 			continue
 		}
 
@@ -47,7 +46,7 @@ func (s *BacktrackingSolver) solveAssignment(assignment Assignment, constraints 
 			var ok bool
 			nextAssignment, ok = s.inference.Inference(nextAssignment.Clone(), constraints, varIdx)
 			if !ok {
-				variable.Domain.Unset(valueIdx)
+				assignment.Unset(varIdx, valueIdx)
 				continue
 			}
 		}
@@ -56,11 +55,11 @@ func (s *BacktrackingSolver) solveAssignment(assignment Assignment, constraints 
 			return res
 		}
 
-		variable.Domain.Unset(valueIdx)
+		assignment.Unset(varIdx, valueIdx)
 	}
 
-	variable.Unassign()
-	variable.Domain = origDomain
+	assignment.Unassign(varIdx)
+	assignment.OverwriteDomain(varIdx, origDomain)
 
 	return nil
 }
