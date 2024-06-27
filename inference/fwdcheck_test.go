@@ -25,7 +25,7 @@ func BenchmarkAusMapWithFwdCheck(b *testing.B) {
 }
 
 func TestNQueensWithFwdCheck(t *testing.T) {
-	problem := nqueens.New(4)
+	problem := nqueens.New(30)
 	solver := csp.NewBacktrackingSolver(csp.NextUnassignedVariableSelector, csp.FirstDomainValueSelector, FwdCheck)
 
 	result := solver.Solve(problem)
