@@ -12,6 +12,18 @@ func abs(x int) int {
 	return x
 }
 
+var nQueensConstraintFunc csp.ConstraintFunc = func(indices []int, assignment *csp.Assignment) bool {
+	v1, ok := assignment.AssignedValue(indices[0])
+	if !ok {
+		return true
+	}
+	v2, ok := assignment.AssignedValue(indices[1])
+	if !ok {
+		return true
+	}
+	return v1 != v2 && abs(int(v1)-int(v2)) != abs(indices[0]-indices[1])
+}
+
 func New(n int) *csp.GenericCSP {
 	domains := make([]csp.ValueSet, n)
 	values := make([]csp.Value, n)
@@ -23,17 +35,7 @@ func New(n int) *csp.GenericCSP {
 		domains[i] = slices.Clone(values)
 		for j := 0; j < n; j++ {
 			if j != i {
-				constraints = append(constraints, csp.NewConstraint([]int{i, j}, func(indices []int, assignment *csp.Assignment) bool {
-					v1, ok := assignment.AssignedValue(indices[0])
-					if !ok {
-						return true
-					}
-					v2, ok := assignment.AssignedValue(indices[1])
-					if !ok {
-						return true
-					}
-					return v1 != v2 && abs(int(v1)-int(v2)) != abs(i-j)
-				}))
+				constraints = append(constraints, csp.NewConstraint([]int{i, j}, nQueensConstraintFunc))
 			}
 		}
 	}
