@@ -1,5 +1,7 @@
 package csp
 
+import "fmt"
+
 type SolverProgressListener interface {
 	OnSolverProgress(assignment *Assignment)
 }
@@ -9,16 +11,21 @@ type BacktrackingSolver struct {
 	valueSelector    ValueSelector
 	inference        Inference
 
+	stepsCounter int
+
 	Listener SolverProgressListener
 }
 
 func (s *BacktrackingSolver) Solve(csp CSP) []Value {
 	assignment := createInitialAssignment(csp)
+	s.stepsCounter = 0
 	res := s.solveAssignment(assignment, csp.Constraints())
+	fmt.Printf("solved in %d steps\n", s.stepsCounter)
 	return res
 }
 
 func (s *BacktrackingSolver) solveAssignment(assignment *Assignment, constraints []Constraint) []Value {
+	s.stepsCounter++
 	if s.Listener != nil {
 		s.Listener.OnSolverProgress(assignment)
 	}
