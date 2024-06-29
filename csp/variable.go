@@ -10,6 +10,7 @@ type Variable struct {
 	ValueIdx int
 	Assigned bool
 
+	Domain      Domain
 	Constraints []Constraint
 }
 
@@ -40,6 +41,7 @@ func (v *Variable) Clone() Variable {
 		ValueIdx:    v.ValueIdx,
 		Assigned:    v.Assigned,
 		Constraints: v.Constraints,
+		Domain:      v.Domain.Clone(),
 	}
 }
 
@@ -48,4 +50,5 @@ func (v *Variable) Copy(other *Variable) {
 	other.ValueIdx = v.ValueIdx
 	other.Assigned = v.Assigned
 	other.Constraints = v.Constraints
+	other.Domain = v.Domain.Clone()
 }

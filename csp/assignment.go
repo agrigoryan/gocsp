@@ -4,7 +4,6 @@ import "slices"
 
 type Assignment struct {
 	Variables []Variable
-	Domains   []Domain
 }
 
 func (a *Assignment) IsConsistent(constraints []Constraint) bool {
@@ -38,15 +37,15 @@ func (a *Assignment) Constraints(varIdx int) []Constraint {
 }
 
 func (a *Assignment) Domain(varIdx int) *Domain {
-	return &a.Domains[varIdx]
+	return &a.Variables[varIdx].Domain
 }
 
 func (a *Assignment) DomainValue(varIdx int, valIdx int) Value {
-	return a.Domains[varIdx].Value(valIdx)
+	return a.Variables[varIdx].Domain.Value(valIdx)
 }
 
 func (a *Assignment) OverwriteDomain(varIdx int, domain Domain) {
-	a.Domains[varIdx] = domain
+	a.Variables[varIdx].Domain = domain
 }
 
 func (a *Assignment) Assigned(varIdx int) bool {
@@ -62,27 +61,27 @@ func (a *Assignment) Unassign(varIdx int) {
 }
 
 func (a *Assignment) DomainSize(varIdx int) int {
-	return a.Domains[varIdx].Size()
+	return a.Variables[varIdx].Domain.Size()
 }
 
 func (a *Assignment) Set(varIdx, valIdx int) {
-	a.Domains[varIdx].Set(valIdx)
+	a.Variables[varIdx].Domain.Set(valIdx)
 }
 
 func (a *Assignment) Unset(varIdx, valIdx int) {
-	a.Domains[varIdx].Unset(valIdx)
+	a.Variables[varIdx].Domain.Unset(valIdx)
 }
 
 func (a *Assignment) Contains(varIdx, valIdx int) {
-	a.Domains[varIdx].Contains(valIdx)
+	a.Variables[varIdx].Domain.Contains(valIdx)
 }
 
 func (a *Assignment) RangeDomain(varIdx int, fn func(int) bool) {
-	a.Domains[varIdx].Range(fn)
+	a.Variables[varIdx].Domain.Range(fn)
 }
 
 func (a *Assignment) FilterDomain(varIdx int, fn func(int) bool) {
-	a.Domains[varIdx].Filter(fn)
+	a.Variables[varIdx].Domain.Filter(fn)
 }
 
 func (a *Assignment) AssignedValueIdx(idx int) (int, bool) {
@@ -97,12 +96,11 @@ func (a *Assignment) AssignedValue(idx int) (Value, bool) {
 }
 
 func (a *Assignment) Clone() *Assignment {
-	clonedDomains := slices.Clone(a.Domains)
-	for i := range clonedDomains {
-		clonedDomains[i] = clonedDomains[i].Clone()
+	clonedVars := slices.Clone(a.Variables)
+	for i := range clonedVars {
+		clonedVars[i] = clonedVars[i].Clone()
 	}
 	return &Assignment{
-		Variables: a.Variables,
-		Domains:   clonedDomains,
+		Variables: clonedVars,
 	}
 }

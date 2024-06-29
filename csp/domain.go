@@ -167,8 +167,8 @@ func NewDomainWithRemainingIndices(values ValueSet) DomainWithRemainingIndices {
 	}
 }
 
-type Domain = DomainWithBitmap
+type Domain = DomainWithRemainingIndices
 
 func NewDomain(values ValueSet) Domain {
-	return NewDomainWithBitmap(values)
+	return NewDomainWithRemainingIndices(values)
 }

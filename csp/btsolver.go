@@ -3,7 +3,8 @@ package csp
 import "fmt"
 
 type SolverProgressListener interface {
-	OnSolverProgress(assignment *Assignment)
+	ValueAssigned(assignment *Assignment, varIdx int)
+	ValueUnassigned(assignment *Assignment, varIdx int)
 }
 
 type BacktrackingSolver struct {
@@ -26,9 +27,6 @@ func (s *BacktrackingSolver) Solve(csp CSP) []Value {
 
 func (s *BacktrackingSolver) solveAssignment(assignment *Assignment, constraints []Constraint) []Value {
 	s.stepsCounter++
-	if s.Listener != nil {
-		s.Listener.OnSolverProgress(assignment)
-	}
 
 	if assignment.IsComplete(constraints) {
 		return variableValues(assignment)
@@ -45,12 +43,15 @@ func (s *BacktrackingSolver) solveAssignment(assignment *Assignment, constraints
 			continue
 		}
 
+		if s.Listener != nil {
+			s.Listener.ValueAssigned(assignment, varIdx)
+		}
+
 		nextAssignment := assignment
 
 		if s.inference != nil {
-			var ok bool
-			nextAssignment, ok = s.inference.Inference(nextAssignment.Clone(), constraints, varIdx)
-			if !ok {
+			nextAssignment = nextAssignment.Clone()
+			if !s.inference.Inference(nextAssignment, constraints, varIdx) {
 				assignment.Unset(varIdx, valueIdx)
 				continue
 			}
@@ -65,6 +66,9 @@ func (s *BacktrackingSolver) solveAssignment(assignment *Assignment, constraints
 
 	assignment.Unassign(varIdx)
 	assignment.OverwriteDomain(varIdx, origDomain)
+	if s.Listener != nil {
+		s.Listener.ValueUnassigned(assignment, varIdx)
+	}
 
 	return nil
 }
@@ -72,14 +76,10 @@ func (s *BacktrackingSolver) solveAssignment(assignment *Assignment, constraints
 func createInitialAssignment(csp CSP) *Assignment {
 	numDomains := len(csp.Domains())
 	variables := make([]Variable, numDomains)
-	domains := make([]Domain, numDomains)
 
 	for i, d := range csp.Domains() {
-		variables[i] = Variable{
-			Index:    i,
-			Assigned: false,
-		}
-		domains[i] = NewDomain(d)
+		variables[i].Index = i
+		variables[i].Domain = NewDomain(d)
 	}
 
 	for _, c := range csp.Constraints() {
@@ -90,7 +90,6 @@ func createInitialAssignment(csp CSP) *Assignment {
 
 	return &Assignment{
 		Variables: variables,
-		Domains:   domains,
 	}
 }
 

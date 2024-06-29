@@ -70,7 +70,7 @@ func ac3Revise(assignment *csp.Assignment, a *arc) bool {
 	return revised
 }
 
-var AC3 csp.InferenceFunc = func(assignment *csp.Assignment, constraints []csp.Constraint, varIdx int) (*csp.Assignment, bool) {
+var AC3 csp.InferenceFunc = func(assignment *csp.Assignment, constraints []csp.Constraint, varIdx int) bool {
 	// optionally limit the initial set of arcs to the constraints of the newly assigned variable
 	constraints = assignment.Constraints(varIdx)
 
@@ -96,7 +96,7 @@ var AC3 csp.InferenceFunc = func(assignment *csp.Assignment, constraints []csp.C
 
 		if ac3Revise(assignment, a) {
 			if assignment.DomainSize(varIdx) == 0 {
-				return assignment, false
+				return false
 			}
 
 			for _, c := range assignment.Constraints(varIdx) {
@@ -115,5 +115,5 @@ var AC3 csp.InferenceFunc = func(assignment *csp.Assignment, constraints []csp.C
 		}
 	}
 
-	return assignment, true
+	return true
 }
