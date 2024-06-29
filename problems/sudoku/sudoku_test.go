@@ -3,32 +3,19 @@ package sudoku
 import (
 	"fmt"
 	"github.com/agrigoryan/gocsp/csp"
-	"github.com/agrigoryan/gocsp/inference"
 	"github.com/stretchr/testify/assert"
 	"testing"
 )
 
 func TestSudokuSolver(t *testing.T) {
 	input := `
- *-----------*
- |.3.|4..|...|
- |9.2|8.6|3.1|
- |...|...|.2.|
- |---+---+---|
- |8..|.6.|7..|
- |.6.|2.5|.9.|
- |..3|.4.|..8|
- |---+---+---|
- |.7.|...|...|
- |4.8|9.2|5.6|
- |...|..8|.3.|
- *-----------*
+1..4.8....5....7...........4.63.........7.59........2....8....16.......3.9..2....
 `
 	board := NewBoardFromString(input)
 	fmt.Println(board)
 
 	problem := New(board)
-	solver := csp.NewBacktrackingSolver(csp.MRVVariableSelector, csp.FirstDomainValueSelector, inference.FwdCheck)
+	solver := csp.NewBacktrackingSolver(csp.MRVVariableSelector, csp.FirstDomainValueSelector, InferenceFunc)
 	result := solver.Solve(problem)
 
 	assert.NotNil(t, result)

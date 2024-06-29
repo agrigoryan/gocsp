@@ -35,6 +35,9 @@ func NewBoard() Board {
 
 func NewBoardFromString(input string) Board {
 	board := NewBoard()
+	for i := range board {
+		board[i] = 0xFF
+	}
 	idx := 0
 	for _, r := range []rune(input) {
 		if r == '0' || r == '.' {
