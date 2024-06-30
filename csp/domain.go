@@ -38,11 +38,7 @@ func (d *DomainWithBitmap) Filter(fn func(int) bool) {
 	}
 }
 
-func (d *DomainWithBitmap) Set(idx int) {
-	d.bitmap.Set(uint(idx))
-}
-
-func (d *DomainWithBitmap) Unset(idx int) {
+func (d *DomainWithBitmap) Remove(idx int) {
 	d.bitmap.Clear(uint(idx))
 }
 
@@ -163,8 +159,8 @@ func NewDomainWithRemainingIndices(values ValueSet) DomainWithRemainingIndices {
 	}
 }
 
-type Domain = DomainWithRemainingIndices
+type Domain = DomainWithBitmap
 
 func NewDomain(values ValueSet) Domain {
-	return NewDomainWithRemainingIndices(values)
+	return NewDomainWithBitmap(values)
 }
