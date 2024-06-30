@@ -59,7 +59,7 @@ func ac3Revise(assignment *csp.Assignment, a *arc) bool {
 			assignment.Unassign(a.y)
 		}
 		if !anyValueSatisfiesArc {
-			assignment.Unset(a.x, i)
+			assignment.Remove(a.x, i)
 			revised = true
 		}
 		return false

@@ -39,7 +39,7 @@ func (s *BacktrackingSolver) solveAssignment(assignment *Assignment, constraints
 		valueIdx := s.valueSelector.SelectNextValue(assignment, varIdx)
 		assignment.Assign(varIdx, valueIdx)
 		if !assignment.IsConsistent(assignment.Constraints(varIdx)) {
-			assignment.Unset(varIdx, valueIdx)
+			assignment.Remove(varIdx, valueIdx)
 			continue
 		}
 
@@ -48,7 +48,7 @@ func (s *BacktrackingSolver) solveAssignment(assignment *Assignment, constraints
 		if s.inference != nil {
 			nextAssignment = nextAssignment.Clone()
 			if !s.inference.Inference(nextAssignment, constraints, varIdx) {
-				assignment.Unset(varIdx, valueIdx)
+				assignment.Remove(varIdx, valueIdx)
 				continue
 			}
 		}
@@ -61,7 +61,7 @@ func (s *BacktrackingSolver) solveAssignment(assignment *Assignment, constraints
 			return res
 		}
 
-		assignment.Unset(varIdx, valueIdx)
+		assignment.Remove(varIdx, valueIdx)
 	}
 
 	assignment.Unassign(varIdx)

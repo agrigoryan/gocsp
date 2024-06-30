@@ -104,17 +104,13 @@ func (d *DomainWithRemainingIndices) Range(fn func(int) bool) {
 func (d *DomainWithRemainingIndices) Filter(fn func(int) bool) {
 	for i := 0; i < len(d.remaining); i++ {
 		if !fn(d.remaining[i]) {
-			d.Unset(d.remaining[i])
+			d.Remove(d.remaining[i])
 			i--
 		}
 	}
 }
 
-func (d *DomainWithRemainingIndices) Set(idx int) {
-	d.remaining = append(d.remaining, idx)
-}
-
-func (d *DomainWithRemainingIndices) Unset(idx int) {
+func (d *DomainWithRemainingIndices) Remove(idx int) {
 	rIdx := -1
 	for i := 0; i < len(d.remaining); i++ {
 		if d.remaining[i] == idx {

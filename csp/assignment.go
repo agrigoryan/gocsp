@@ -64,12 +64,8 @@ func (a *Assignment) DomainSize(varIdx int) int {
 	return a.Variables[varIdx].Domain.Size()
 }
 
-func (a *Assignment) Set(varIdx, valIdx int) {
-	a.Variables[varIdx].Domain.Set(valIdx)
-}
-
-func (a *Assignment) Unset(varIdx, valIdx int) {
-	a.Variables[varIdx].Domain.Unset(valIdx)
+func (a *Assignment) Remove(varIdx, valIdx int) {
+	a.Variables[varIdx].Domain.Remove(valIdx)
 }
 
 func (a *Assignment) Contains(varIdx, valIdx int) {
