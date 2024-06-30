@@ -8,9 +8,7 @@ import (
 )
 
 func TestSudokuSolver(t *testing.T) {
-	input := `
-1..4.8....5....7...........4.63.........7.59........2....8....16.......3.9..2....
-`
+	input := "85...24..72......9..4.........1.7..23.5...9...4...........8..7..17..........36.4."
 	board := NewBoardFromString(input)
 	fmt.Println(board)
 

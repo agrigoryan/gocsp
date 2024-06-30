@@ -43,10 +43,6 @@ func (s *BacktrackingSolver) solveAssignment(assignment *Assignment, constraints
 			continue
 		}
 
-		if s.Listener != nil {
-			s.Listener.ValueAssigned(assignment, varIdx)
-		}
-
 		nextAssignment := assignment
 
 		if s.inference != nil {
@@ -55,6 +51,10 @@ func (s *BacktrackingSolver) solveAssignment(assignment *Assignment, constraints
 				assignment.Unset(varIdx, valueIdx)
 				continue
 			}
+		}
+
+		if s.Listener != nil {
+			s.Listener.ValueAssigned(nextAssignment, varIdx)
 		}
 
 		if res := s.solveAssignment(nextAssignment, constraints); res != nil {
