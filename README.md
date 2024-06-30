@@ -38,3 +38,5 @@ solver := csp.NewBacktrackingSolver(csp.MRVVariableSelector,  csp.FirstDomainVal
 result := solver.Solve(problem)
 fmt.Println(result)
 ```
+
+Sudoku solver example: github.com/agrigoryan/sudoku
