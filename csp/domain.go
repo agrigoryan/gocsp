@@ -9,20 +9,20 @@ import (
 type Value int
 type ValueSet []Value
 
-type DomainWithBitmap struct {
+type domainWithBitmap struct {
 	values ValueSet
 	bitmap *bitset.BitSet
 }
 
-func (d *DomainWithBitmap) Size() int {
+func (d *domainWithBitmap) Size() int {
 	return int(d.bitmap.Count())
 }
 
-func (d *DomainWithBitmap) Value(idx int) Value {
+func (d *domainWithBitmap) Value(idx int) Value {
 	return d.values[idx]
 }
 
-func (d *DomainWithBitmap) Range(fn func(int) bool) {
+func (d *domainWithBitmap) Range(fn func(int) bool) {
 	for i := 0; i < len(d.values); i++ {
 		if d.bitmap.Test(uint(i)) && fn(i) {
 			return
@@ -30,7 +30,7 @@ func (d *DomainWithBitmap) Range(fn func(int) bool) {
 	}
 }
 
-func (d *DomainWithBitmap) Filter(fn func(int) bool) {
+func (d *domainWithBitmap) Filter(fn func(int) bool) {
 	for i := 0; i < len(d.values); i++ {
 		if d.bitmap.Test(uint(i)) && !fn(i) {
 			d.bitmap.Clear(uint(i))
@@ -38,20 +38,20 @@ func (d *DomainWithBitmap) Filter(fn func(int) bool) {
 	}
 }
 
-func (d *DomainWithBitmap) Remove(idx int) {
+func (d *domainWithBitmap) Remove(idx int) {
 	d.bitmap.Clear(uint(idx))
 }
 
-func (d *DomainWithBitmap) Contains(idx int) bool {
+func (d *domainWithBitmap) Contains(idx int) bool {
 	return d.bitmap.Test(uint(idx))
 }
 
-func (d *DomainWithBitmap) UnsetAllBut(idx int) {
+func (d *domainWithBitmap) UnsetAllBut(idx int) {
 	d.bitmap.ClearAll()
 	d.bitmap.Set(uint(idx))
 }
 
-func (d *DomainWithBitmap) String() string {
+func (d *domainWithBitmap) String() string {
 	buf := bytes.Buffer{}
 	buf.WriteByte('{')
 	d.Range(func(i int) bool {
@@ -62,34 +62,34 @@ func (d *DomainWithBitmap) String() string {
 	return buf.String()
 }
 
-func (d *DomainWithBitmap) Clone() DomainWithBitmap {
-	return DomainWithBitmap{
+func (d *domainWithBitmap) Clone() domainWithBitmap {
+	return domainWithBitmap{
 		values: d.values,
 		bitmap: d.bitmap.Clone(),
 	}
 }
 
-func NewDomainWithBitmap(values ValueSet) DomainWithBitmap {
-	return DomainWithBitmap{
+func newDomainWithBitmap(values ValueSet) domainWithBitmap {
+	return domainWithBitmap{
 		values: values,
 		bitmap: bitset.New(uint(len(values))).SetAll(),
 	}
 }
 
-type DomainWithRemainingIndices struct {
+type domainWithRemainingIndices struct {
 	values    []Value
 	remaining []int
 }
 
-func (d *DomainWithRemainingIndices) Size() int {
+func (d *domainWithRemainingIndices) Size() int {
 	return len(d.remaining)
 }
 
-func (d *DomainWithRemainingIndices) Value(idx int) Value {
+func (d *domainWithRemainingIndices) Value(idx int) Value {
 	return d.values[idx]
 }
 
-func (d *DomainWithRemainingIndices) Range(fn func(int) bool) {
+func (d *domainWithRemainingIndices) Range(fn func(int) bool) {
 	for i := 0; i < len(d.remaining); i++ {
 		if fn(d.remaining[i]) {
 			return
@@ -97,7 +97,7 @@ func (d *DomainWithRemainingIndices) Range(fn func(int) bool) {
 	}
 }
 
-func (d *DomainWithRemainingIndices) Filter(fn func(int) bool) {
+func (d *domainWithRemainingIndices) Filter(fn func(int) bool) {
 	for i := 0; i < len(d.remaining); i++ {
 		if !fn(d.remaining[i]) {
 			d.Remove(d.remaining[i])
@@ -106,7 +106,7 @@ func (d *DomainWithRemainingIndices) Filter(fn func(int) bool) {
 	}
 }
 
-func (d *DomainWithRemainingIndices) Remove(idx int) {
+func (d *domainWithRemainingIndices) Remove(idx int) {
 	rIdx := -1
 	for i := 0; i < len(d.remaining); i++ {
 		if d.remaining[i] == idx {
@@ -121,7 +121,7 @@ func (d *DomainWithRemainingIndices) Remove(idx int) {
 	d.remaining = d.remaining[:len(d.remaining)-1]
 }
 
-func (d *DomainWithRemainingIndices) Contains(idx int) bool {
+func (d *domainWithRemainingIndices) Contains(idx int) bool {
 	for i := 0; i < len(d.remaining); i++ {
 		if d.remaining[i] == idx {
 			return true
@@ -130,7 +130,7 @@ func (d *DomainWithRemainingIndices) Contains(idx int) bool {
 	return false
 }
 
-func (d *DomainWithRemainingIndices) String() string {
+func (d *domainWithRemainingIndices) String() string {
 	buf := bytes.Buffer{}
 	buf.WriteByte('{')
 	d.Range(func(i int) bool {
@@ -141,26 +141,26 @@ func (d *DomainWithRemainingIndices) String() string {
 	return buf.String()
 }
 
-func (d *DomainWithRemainingIndices) Clone() DomainWithRemainingIndices {
-	return DomainWithRemainingIndices{
+func (d *domainWithRemainingIndices) Clone() domainWithRemainingIndices {
+	return domainWithRemainingIndices{
 		values:    d.values,
 		remaining: d.remaining,
 	}
 }
 
-func NewDomainWithRemainingIndices(values ValueSet) DomainWithRemainingIndices {
+func newDomainWithRemainingIndices(values ValueSet) domainWithRemainingIndices {
 	remaining := make([]int, len(values))
 	for i := 0; i < len(values); i++ {
 		remaining[i] = i
 	}
-	return DomainWithRemainingIndices{
+	return domainWithRemainingIndices{
 		values:    values,
 		remaining: remaining,
 	}
 }
 
-type Domain = DomainWithBitmap
+type Domain = domainWithBitmap
 
 func NewDomain(values ValueSet) Domain {
-	return NewDomainWithBitmap(values)
+	return newDomainWithBitmap(values)
 }
